@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getQuestions, saveQuestions, saveQuiz } from "@/lib/questions";
+import { saveQuestions, saveQuiz } from "@/lib/questions";
+import { createClient } from "@/lib/supabase/server";
 import { Question, Quiz, Difficulty, QuizMode } from "@/types";
 
 type IncomingQuestion = {
@@ -18,7 +19,6 @@ type RequestBody = {
   mode: QuizMode;
   difficulty: Difficulty | "mixed";
   questions: IncomingQuestion[];
-  created_by?: string | null;
 };
 
 function generateId(prefix: string): string {
@@ -27,6 +27,24 @@ function generateId(prefix: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body: RequestBody = await req.json();
 
     if (!body.title?.trim()) {
@@ -40,21 +58,13 @@ export async function POST(req: NextRequest) {
     }
 
     const now = new Date().toISOString();
-    const existingQuestions = getQuestions();
-    const existingIds = new Set(existingQuestions.map((q) => q.id));
 
     const newQuestions: Question[] = body.questions.map((q) => {
-      let id = generateId("q");
-      while (existingIds.has(id)) id = generateId("q");
-      existingIds.add(id);
-
       const options: [string, string, string, string] =
-        q.type === "true_false"
-          ? ["True", "False", "", ""]
-          : q.options;
+        q.type === "true_false" ? ["True", "False", "", ""] : q.options;
 
       return {
-        id,
+        id: generateId("q"),
         type: "multiple_choice",
         subject: body.subject,
         tags: q.tags ?? [],
@@ -65,11 +75,11 @@ export async function POST(req: NextRequest) {
         explanation: q.explanation ?? "",
         created_at: now,
         source: "manual" as const,
-        created_by: body.created_by ?? null,
+        created_by: user.id,
       };
     });
 
-    saveQuestions(newQuestions);
+    await saveQuestions(newQuestions, user.id);
 
     const quiz: Quiz = {
       id: generateId("quiz"),
@@ -79,10 +89,10 @@ export async function POST(req: NextRequest) {
       question_ids: newQuestions.map((q) => q.id),
       created_at: now,
       mode: body.mode,
-      created_by: body.created_by ?? null,
+      created_by: user.id,
     };
 
-    saveQuiz(quiz);
+    await saveQuiz(quiz, user.id);
 
     return NextResponse.json({ quizId: quiz.id, questionCount: newQuestions.length });
   } catch (e) {

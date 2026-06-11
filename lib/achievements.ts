@@ -1,4 +1,3 @@
-import { getProfile, unlockAchievements } from "./userProfile";
 
 export type AchievementCategory = "performance" | "consistency" | "exploration" | "volume";
 
@@ -209,9 +208,11 @@ export const ACHIEVEMENTS: Achievement[] = [
   },
 ];
 
-export function checkAchievements(ctx: AchievementContext): string[] {
-  const profile = getProfile();
-  const already = new Set(profile.unlockedAchievements);
+export function checkAchievements(
+  ctx: AchievementContext,
+  alreadyUnlocked: string[]
+): string[] {
+  const already = new Set(alreadyUnlocked);
   const newlyUnlocked: string[] = [];
 
   for (const a of ACHIEVEMENTS) {
@@ -223,15 +224,9 @@ export function checkAchievements(ctx: AchievementContext): string[] {
   return newlyUnlocked;
 }
 
-export function applyNewAchievements(
-  newIds: string[],
-  baseProfile: ReturnType<typeof getProfile>
-): { profile: ReturnType<typeof getProfile>; bonusXP: number } {
-  if (newIds.length === 0) return { profile: baseProfile, bonusXP: 0 };
-  const bonusXP = newIds.reduce((sum, id) => {
+export function calcBonusXP(newIds: string[]): number {
+  return newIds.reduce((sum, id) => {
     const a = ACHIEVEMENTS.find((x) => x.id === id);
     return sum + (a?.xpReward ?? 0);
   }, 0);
-  const updated = unlockAchievements(newIds);
-  return { profile: updated, bonusXP };
 }

@@ -2,9 +2,9 @@ import { getSubjects, getQuestions } from "@/lib/questions";
 import { SubjectGrid, type SubjectCardData } from "@/app/components/SubjectGrid";
 import type { Difficulty } from "@/types";
 
-export default function Home() {
+export default async function Home() {
   const subjects = getSubjects();
-  const questions = getQuestions();
+  const questions = await getQuestions();
 
   const cards: SubjectCardData[] = subjects.map((subject) => {
     const qs = questions.filter((q) => q.subject === subject.id);

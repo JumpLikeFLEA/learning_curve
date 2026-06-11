@@ -4,8 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Trash2, GripVertical, CheckCircle2, Circle, Save, Eye, Edit3,
-  Tag, HelpCircle, AlignLeft
+  Tag, HelpCircle, AlignLeft, Globe, Lock
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 type QuestionType = "multiple_choice" | "true_false" | "short_answer";
 
@@ -48,10 +49,13 @@ export default function CustomPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [subject, setSubject] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const [questions, setQuestions] = useState<QuizQuestion[]>([createQuestion("multiple_choice")]);
   const [activeQuestion, setActiveQuestion] = useState(0);
   const [mode, setMode] = useState<"edit" | "preview">("edit");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const addQuestion = (type: QuestionType) => {
     const newQ = createQuestion(type);
@@ -78,13 +82,26 @@ export default function CustomPage() {
     }));
   };
 
-  const handleSave = () => {
-    const quizData: CustomQuizData = { title, description, subject, questions };
-    const stored = JSON.parse(localStorage.getItem("customQuizzes") ?? "[]") as CustomQuizData[];
-    stored.push(quizData);
-    localStorage.setItem("customQuizzes", JSON.stringify(stored));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from("custom_quizzes").insert({
+        title: title.trim(),
+        description: description.trim() || null,
+        subject: subject.trim() || null,
+        questions,
+        is_public: isPublic,
+      });
+      if (error) throw new Error(error.message);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Save failed.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const isValid = title.trim() && questions.length > 0 && questions.every(q => q.question.trim());
@@ -109,11 +126,11 @@ export default function CustomPage() {
           </button>
           <button
             onClick={handleSave}
-            disabled={!isValid}
+            disabled={!isValid || saving}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#4f46e5] text-white hover:bg-[#4338ca] transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {saved ? <CheckCircle2 size={15} /> : <Save size={15} />}
-            {saved ? "Saved!" : "Save Quiz"}
+            {saved ? "Saved!" : saving ? "Saving…" : "Save Quiz"}
           </button>
         </div>
       </div>
@@ -157,6 +174,23 @@ export default function CustomPage() {
                   className="px-3 py-2 rounded-xl border border-border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#4f46e5]/30 focus:border-[#4f46e5] transition-all"
                 />
               </div>
+              <button
+                type="button"
+                onClick={() => setIsPublic(p => !p)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all cursor-pointer ${
+                  isPublic
+                    ? "border-[#4f46e5]/40 bg-[#eef2ff] text-[#4f46e5]"
+                    : "border-border text-muted-foreground hover:bg-accent"
+                }`}
+              >
+                {isPublic ? <Globe size={13} /> : <Lock size={13} />}
+                {isPublic ? "Public — anyone can find it" : "Private — only you"}
+              </button>
+              {saveError && (
+                <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                  {saveError}
+                </p>
+              )}
             </div>
 
             {/* Questions List */}

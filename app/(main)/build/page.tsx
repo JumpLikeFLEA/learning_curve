@@ -2,9 +2,9 @@ import { getSubjects, getQuestions } from "@/lib/questions";
 import BuildForm from "./BuildForm";
 import type { SubjectCardData } from "@/app/components/SubjectGrid";
 
-export default function BuildPage() {
+export default async function BuildPage() {
   const subjects = getSubjects();
-  const questions = getQuestions();
+  const questions = await getQuestions();
 
   const subjectCards: SubjectCardData[] = subjects.map((s) => {
     const qs = questions.filter((q) => q.subject === s.id);

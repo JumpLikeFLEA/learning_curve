@@ -8,6 +8,7 @@ import {
   BookOpen,
   GraduationCap,
   LayoutDashboard,
+  LogOut,
   PlusSquare,
   Settings2,
   Shield,
@@ -23,6 +24,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/app/components/ui/sidebar";
+import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { label: "Home", description: "10 questions, pick & go", href: "/", icon: BookOpen },
@@ -45,12 +47,7 @@ type UserProfile = {
   level: number;
 };
 
-function xpForLevel(level: number) {
-  return level * 500;
-}
-
-function UserXPCard({ profile }: { profile: UserProfile }) {
-  const xpNeeded = xpForLevel(profile.level);
+function UserXPCard({ profile, onSignOut }: { profile: UserProfile; onSignOut: () => void }) {
   const initials = profile.displayName
     .split(" ")
     .map((w) => w[0])
@@ -71,8 +68,17 @@ function UserXPCard({ profile }: { profile: UserProfile }) {
           Level {profile.level} · {profile.xp} XP
         </p>
       </div>
-      <div className="px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 shrink-0 group-data-[collapsible=icon]:hidden">
-        <span className="text-amber-600 text-xs font-medium">Lv.{profile.level}</span>
+      <div className="flex items-center gap-1.5 shrink-0 group-data-[collapsible=icon]:hidden">
+        <div className="px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200">
+          <span className="text-amber-600 text-xs font-medium">Lv.{profile.level}</span>
+        </div>
+        <button
+          onClick={onSignOut}
+          aria-label="Sign out"
+          className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        >
+          <LogOut size={14} />
+        </button>
       </div>
     </div>
   );
@@ -89,21 +95,33 @@ export function AppSidebar() {
   });
 
   React.useEffect(() => {
-    setIsAdmin(localStorage.getItem("role") === "admin");
-    const stored = localStorage.getItem("userProfile");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as Partial<UserProfile>;
-        setProfile({
-          displayName: parsed.displayName ?? "Student",
-          xp: parsed.xp ?? 0,
-          level: parsed.level ?? 1,
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("profiles")
+        .select("display_name, role, total_xp")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (!data) return;
+          const xp = data.total_xp ?? 0;
+          setProfile({
+            displayName: data.display_name ?? "Student",
+            xp,
+            level: Math.floor(xp / 500) + 1,
+          });
+          setIsAdmin(data.role === "admin");
         });
-      } catch {
-        // ignore corrupt data
-      }
-    }
+    });
   }, []);
+
+  async function handleSignOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   const items = isAdmin ? [...navItems, adminItem] : navItems;
 
@@ -200,7 +218,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="px-3 py-4 border-t border-sidebar-border">
-        <UserXPCard profile={profile} />
+        <UserXPCard profile={profile} onSignOut={handleSignOut} />
       </SidebarFooter>
 
       <SidebarRail />

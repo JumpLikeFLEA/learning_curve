@@ -1,60 +1,79 @@
-import fs from "fs";
 import path from "path";
+import fs from "fs";
 import { Question, Quiz, Result, QuizFilter, Subject } from "@/types";
+import { createClient } from "@/lib/supabase/server";
 
+// subjects.json stays on disk — it's static config, not user data
 const DATA_DIR = path.join(process.cwd(), "data");
 
-function readJson<T>(filename: string): T {
-  const raw = fs.readFileSync(path.join(DATA_DIR, filename), "utf-8");
-  return JSON.parse(raw) as T;
-}
-
-// DEV-ONLY: replace with Supabase in Phase 2
-function writeJson<T>(filename: string, data: T): void {
-  fs.writeFileSync(path.join(DATA_DIR, filename), JSON.stringify(data, null, 2));
-}
-
-export function getQuestions(): Question[] {
-  return readJson<Question[]>("questions.json");
-}
-
 export function getSubjects(): Subject[] {
-  return readJson<Subject[]>("subjects.json");
+  const raw = fs.readFileSync(path.join(DATA_DIR, "subjects.json"), "utf-8");
+  return JSON.parse(raw) as Subject[];
 }
 
-export function getQuizById(id: string): Quiz | undefined {
-  const quizzes = readJson<Quiz[]>("quizzes.json");
-  return quizzes.find((q) => q.id === id);
+export async function getQuestions(): Promise<Question[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("questions").select("*");
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Question[];
 }
 
-export function getResults(): Result[] {
-  return readJson<Result[]>("results.json");
+export async function getQuizById(id: string): Promise<Quiz | undefined> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("quizzes")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) return undefined;
+  return data as Quiz;
 }
 
-// DEV-ONLY: replace with Supabase in Phase 2
-export function saveResult(result: Result): void {
-  const results = getResults();
-  results.push(result);
-  writeJson("results.json", results);
+export async function getResults(): Promise<Result[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("results")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("taken_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Result[];
 }
 
-// DEV-ONLY: replace with Supabase in Phase 2
-export function saveQuiz(quiz: Quiz): void {
-  const quizzes = readJson<Quiz[]>("quizzes.json");
-  quizzes.push(quiz);
-  writeJson("quizzes.json", quizzes);
+export async function saveResult(result: Result, userId: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("results")
+    .insert({ ...result, user_id: userId });
+  if (error) throw new Error(error.message);
 }
 
-// DEV-ONLY: replace with Supabase in Phase 2
-export function saveQuestions(newQuestions: Question[]): void {
-  const existing = getQuestions();
-  writeJson("questions.json", [...existing, ...newQuestions]);
+export async function saveQuiz(quiz: Quiz, userId?: string): Promise<void> {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("quizzes")
+    .insert({ ...quiz, created_by: userId ?? null });
+  if (error) throw new Error(error.message);
 }
 
-export function sampleQuestions(filter: QuizFilter): Question[] {
-  const all = getQuestions();
+export async function saveQuestions(newQuestions: Question[], userId?: string): Promise<void> {
+  const supabase = await createClient();
+  const rows = newQuestions.map((q) => ({
+    ...q,
+    created_by: userId ?? null,
+  }));
+  const { error } = await supabase.from("questions").insert(rows);
+  if (error) throw new Error(error.message);
+}
 
-  // If a subject is provided but no explicit tags, resolve tags from subjects.json
+export async function sampleQuestions(filter: QuizFilter): Promise<Question[]> {
+  const supabase = await createClient();
+
   let effectiveTags = filter.tags;
   if (filter.subject && effectiveTags.length === 0) {
     const subjects = getSubjects();
@@ -62,22 +81,29 @@ export function sampleQuestions(filter: QuizFilter): Question[] {
     if (subject) effectiveTags = subject.tags;
   }
 
-  const pool = all.filter((q) => {
-    const tagMatch =
-      effectiveTags.length === 0 || q.tags.some((t) => effectiveTags.includes(t));
-    const diffMatch =
-      filter.difficulty === "mixed" || q.difficulty === filter.difficulty;
-    return tagMatch && diffMatch;
-  });
+  let query = supabase.from("questions").select("*");
 
+  if (filter.difficulty !== "mixed") {
+    query = query.eq("difficulty", filter.difficulty);
+  }
+  if (effectiveTags.length > 0) {
+    query = query.overlaps("tags", effectiveTags);
+  }
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+
+  const pool = (data ?? []) as Question[];
   const count = filter.mode === "exam" ? 50 : filter.size;
   return shuffle(pool).slice(0, count);
 }
 
-export function getAllTags(): string[] {
-  const questions = getQuestions();
+export async function getAllTags(): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("questions").select("tags");
+  if (error) throw new Error(error.message);
   const tagSet = new Set<string>();
-  questions.forEach((q) => q.tags.forEach((t) => tagSet.add(t)));
+  (data ?? []).forEach((row: { tags: string[] }) => row.tags.forEach((t) => tagSet.add(t)));
   return Array.from(tagSet).sort();
 }
 

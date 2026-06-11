@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getResults, getQuestions, getQuizById, getSubjects } from "@/lib/questions";
+import { getQuestions, getQuizById, getSubjects } from "@/lib/questions";
+import { createClient } from "@/lib/supabase/server";
 import { QuizMode } from "@/types";
-import XPAwarder from "@/app/components/XPAwarder";
 
 function getGrade(pct: number): { letter: string; color: string; bg: string } {
   if (pct >= 90) return { letter: "A", color: "text-green-700", bg: "bg-green-50 border-green-200" };
@@ -28,12 +28,18 @@ function formatTime(seconds: number): string {
 export default async function ResultsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  const results = getResults();
-  const result = results.find((r) => r.id === id);
+  const supabase = await createClient();
+  const { data: result } = await supabase
+    .from("results")
+    .select("*")
+    .eq("id", id)
+    .single();
   if (!result) notFound();
 
-  const allQuestions = getQuestions();
-  const quiz = getQuizById(result.quiz_id);
+  const [allQuestions, quiz] = await Promise.all([
+    getQuestions(),
+    getQuizById(result.quiz_id),
+  ]);
 
   const pct = Math.round(result.score * 100);
   const grade = getGrade(pct);
@@ -46,12 +52,13 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
     const firstQ = allQuestions.find((q) => q.id === quiz.question_ids[0]);
     if (firstQ?.subject) subjectLabel = subjectMap.get(firstQ.subject) ?? firstQ.subject;
   }
-  const wrongSet = new Set(result.wrong_question_ids);
+  const wrongIds = result.wrong_question_ids as string[];
+  const wrongSet = new Set(wrongIds);
 
   // Ordered question list from the original quiz, falling back to wrong-only
   const orderedQuestions = quiz
-    ? quiz.question_ids.map((qid) => allQuestions.find((q) => q.id === qid)).filter(Boolean)
-    : result.wrong_question_ids.map((qid) => allQuestions.find((q) => q.id === qid)).filter(Boolean);
+    ? quiz.question_ids.map((qid: string) => allQuestions.find((q) => q.id === qid)).filter(Boolean)
+    : wrongIds.map((qid) => allQuestions.find((q) => q.id === qid)).filter(Boolean);
 
   const reviewQuestions = orderedQuestions as typeof allQuestions;
 
@@ -110,7 +117,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
               By topic
             </p>
             <div className="flex flex-col gap-2">
-              {Object.entries(result.tag_breakdown).map(([tag, { correct, total }]) => {
+              {Object.entries(result.tag_breakdown as Record<string, { correct: number; total: number }>).map(([tag, { correct, total }]) => {
                 const tagPct = Math.round((correct / total) * 100);
                 return (
                   <div key={tag} className="flex items-center gap-3">
@@ -186,14 +193,6 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      <XPAwarder
-        resultId={id}
-        xp={xp}
-        latestScore={result.score}
-        latestCorrect={result.correct}
-        latestTotal={result.total_questions}
-        latestSubject={subjectLabel}
-      />
     </main>
   );
 }

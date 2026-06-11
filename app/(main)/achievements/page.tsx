@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { createClient } from "@/lib/supabase/client";
 import {
   Trophy, Star, Flame, Zap, Target, BookOpen, Brain, Shield,
   Medal, Crown, Rocket, Award, TrendingUp, Clock, Hash, Globe,
@@ -51,27 +52,76 @@ const RARITY_CONFIG = {
   legendary: { label: "Legendary", color: "#f59e0b", border: "border-amber-300" },
 };
 
-const STATS = [
-  { label: "Achievements Unlocked", value: "6 / 15", icon: Trophy, color: "#4f46e5" },
-  { label: "Total XP Earned", value: "2,450", icon: Star, color: "#f59e0b" },
-  { label: "Current Streak", value: "7 days", icon: Flame, color: "#f97316" },
-  { label: "Quizzes Completed", value: "47", icon: Hash, color: "#10b981" },
-  { label: "Avg. Score", value: "81%", icon: TrendingUp, color: "#8b5cf6" },
-  { label: "Total Time", value: "14.2h", icon: Clock, color: "#ec4899" },
-];
+// Stats are computed from live data in the component body below
+
+type ProfileStats = {
+  total_xp: number;
+  current_streak: number;
+  quiz_count: number;
+};
 
 export default function AchievementsPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [showUnlocked, setShowUnlocked] = useState<"all" | "unlocked" | "locked">("all");
+  const [unlockedIds, setUnlockedIds] = useState<Map<string, string>>(new Map());
+  const [profileStats, setProfileStats] = useState<ProfileStats>({ total_xp: 0, current_streak: 0, quiz_count: 0 });
 
-  const filtered = ACHIEVEMENTS.filter(a => {
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase
+      .from("user_achievements")
+      .select("achievement_id, unlocked_at")
+      .then(({ data }) => {
+        if (!data) return;
+        const map = new Map(data.map((r) => [r.achievement_id, r.unlocked_at as string]));
+        setUnlockedIds(map);
+      });
+
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      Promise.all([
+        supabase.from("profiles").select("total_xp, current_streak").eq("id", user.id).single(),
+        supabase.from("results").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+      ]).then(([{ data: profile }, { count }]) => {
+        setProfileStats({
+          total_xp: profile?.total_xp ?? 0,
+          current_streak: profile?.current_streak ?? 0,
+          quiz_count: count ?? 0,
+        });
+      });
+    });
+  }, []);
+
+  const achievements = ACHIEVEMENTS.map((a) => {
+    const unlockedAt = unlockedIds.get(a.id);
+    return {
+      ...a,
+      unlocked: !!unlockedAt,
+      unlockedDate: unlockedAt
+        ? new Date(unlockedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+        : undefined,
+    };
+  });
+
+  const filtered = achievements.filter(a => {
     const catMatch = activeCategory === "All" || a.category === activeCategory;
     const lockMatch = showUnlocked === "all" || (showUnlocked === "unlocked" ? a.unlocked : !a.unlocked);
     return catMatch && lockMatch;
   });
 
-  const unlocked = ACHIEVEMENTS.filter(a => a.unlocked).length;
-  const totalXP = ACHIEVEMENTS.filter(a => a.unlocked).reduce((s, a) => s + a.xp, 0);
+  const unlocked = achievements.filter(a => a.unlocked).length;
+
+  const STATS = [
+    { label: "Achievements Unlocked", value: `${unlocked} / ${ACHIEVEMENTS.length}`, icon: Trophy, color: "#4f46e5" },
+    { label: "Total XP Earned", value: profileStats.total_xp.toLocaleString(), icon: Star, color: "#f59e0b" },
+    { label: "Current Streak", value: `${profileStats.current_streak} days`, icon: Flame, color: "#f97316" },
+    { label: "Quizzes Completed", value: String(profileStats.quiz_count), icon: Hash, color: "#10b981" },
+    { label: "Avg. Score", value: "—", icon: TrendingUp, color: "#8b5cf6" },
+    { label: "Total Time", value: "—", icon: Clock, color: "#ec4899" },
+  ];
+
+  const totalXP = profileStats.total_xp;
 
   return (
     <div className="flex flex-col gap-8">
@@ -102,29 +152,38 @@ export default function AchievementsPage() {
           ))}
         </div>
         <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-5">
-            <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur">
-              <Crown size={30} className="text-amber-300" />
-            </div>
-            <div>
-              <p className="text-white/70 text-sm">Current Level</p>
-              <p className="text-4xl font-bold">12</p>
-              <p className="text-white/70 text-sm">Advanced Learner</p>
-            </div>
-          </div>
-          <div className="flex-1 max-w-xs">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-white/80">Progress to Level 13</span>
-              <span className="text-white font-medium">{totalXP} / 3,000 XP</span>
-            </div>
-            <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full bg-white transition-all"
-                style={{ width: `${Math.min(100, (totalXP / 3000) * 100)}%` }}
-              />
-            </div>
-            <p className="text-white/60 text-xs mt-1.5">{3000 - totalXP} XP to next level</p>
-          </div>
+          {(() => {
+            const XP_PER_LEVEL = 500;
+            const level = Math.floor(totalXP / XP_PER_LEVEL) + 1;
+            const xpIntoLevel = totalXP % XP_PER_LEVEL;
+            return (
+              <>
+                <div className="flex items-center gap-5">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur">
+                    <Crown size={30} className="text-amber-300" />
+                  </div>
+                  <div>
+                    <p className="text-white/70 text-sm">Current Level</p>
+                    <p className="text-4xl font-bold">{level}</p>
+                    <p className="text-white/70 text-sm">Advanced Learner</p>
+                  </div>
+                </div>
+                <div className="flex-1 max-w-xs">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-white/80">Progress to Level {level + 1}</span>
+                    <span className="text-white font-medium">{xpIntoLevel} / {XP_PER_LEVEL} XP</span>
+                  </div>
+                  <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-white transition-all"
+                      style={{ width: `${Math.min(100, (xpIntoLevel / XP_PER_LEVEL) * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-white/60 text-xs mt-1.5">{XP_PER_LEVEL - xpIntoLevel} XP to next level</p>
+                </div>
+              </>
+            );
+          })()}
           <div className="text-right">
             <p className="text-white/70 text-sm">Achievements</p>
             <p className="text-3xl font-bold">{unlocked}<span className="text-lg text-white/60">/{ACHIEVEMENTS.length}</span></p>

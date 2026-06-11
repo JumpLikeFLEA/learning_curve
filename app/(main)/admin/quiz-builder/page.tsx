@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, ChevronDown, ChevronUp, Save, ShieldAlert } from "lucide-react";
-import { getProfile } from "@/lib/userProfile";
+import { createClient } from "@/lib/supabase/client";
 import { Difficulty, QuizMode } from "@/types";
 
 type QuestionType = "multiple_choice" | "true_false";
@@ -71,8 +71,16 @@ export default function QuizBuilderPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    setIsAdmin(role === "admin");
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => setIsAdmin(data?.role === "admin"));
+    });
   }, []);
 
   if (isAdmin === null) return null;
@@ -83,7 +91,7 @@ export default function QuizBuilderPage() {
         <ShieldAlert className="size-10 text-zinc-300" />
         <h1 className="text-lg font-semibold text-zinc-800">Admin access required</h1>
         <p className="text-sm text-zinc-400 text-center max-w-xs">
-          Run <code className="bg-zinc-100 px-1 rounded text-xs">localStorage.setItem(&apos;role&apos;, &apos;admin&apos;)</code> in the browser console, then refresh.
+          Ask an admin to set your role to <code className="bg-zinc-100 px-1 rounded text-xs">admin</code> in the Supabase dashboard.
         </p>
         <button
           onClick={() => router.push("/")}
@@ -141,14 +149,11 @@ export default function QuizBuilderPage() {
       }
     }
 
-    const profile = getProfile();
-
     const payload = {
       title: title.trim(),
       subject,
       mode,
       difficulty,
-      created_by: profile.user_id || null,
       questions: questions.map((q) => ({
         type: q.type,
         question: q.question.trim(),

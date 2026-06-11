@@ -7,6 +7,7 @@ import { Bell, ChevronRight, GraduationCap, PanelLeftIcon, Search } from "lucide
 
 import { Button } from "@/app/components/ui/button";
 import { useSidebar } from "@/app/components/ui/sidebar";
+import { createClient } from "@/lib/supabase/client";
 
 const routeLabels: Record<string, string> = {
   "/": "Basic Quizzes",
@@ -37,15 +38,14 @@ export function Topbar() {
   const [initials, setInitials] = React.useState("S");
 
   React.useEffect(() => {
-    const stored = localStorage.getItem("userProfile");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as { displayName?: string };
-        if (parsed.displayName) setInitials(getInitials(parsed.displayName));
-      } catch {
-        // ignore
-      }
-    }
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .single()
+      .then(({ data }) => {
+        if (data?.display_name) setInitials(getInitials(data.display_name));
+      });
   }, []);
 
   return (
