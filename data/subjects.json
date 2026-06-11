@@ -1,0 +1,128 @@
+[
+  {
+    "id": "mathematics",
+    "name": "Mathematics",
+    "icon": "Calculator",
+    "color": "#6366f1",
+    "bg": "#eef2ff",
+    "tags": [],
+    "subtopics": ["Algebra", "Geometry", "Calculus", "Statistics", "Number Theory", "Linear Algebra", "Trigonometry", "Discrete Math"]
+  },
+  {
+    "id": "physics",
+    "name": "Physics",
+    "icon": "Atom",
+    "color": "#8b5cf6",
+    "bg": "#f5f3ff",
+    "tags": [],
+    "subtopics": ["Mechanics", "Thermodynamics", "Electromagnetism", "Optics", "Quantum Physics", "Relativity", "Nuclear Physics", "Waves"]
+  },
+  {
+    "id": "chemistry",
+    "name": "Chemistry",
+    "icon": "FlaskConical",
+    "color": "#ec4899",
+    "bg": "#fdf2f8",
+    "tags": [],
+    "subtopics": ["Organic Chemistry", "Inorganic Chemistry", "Physical Chemistry", "Biochemistry", "Electrochemistry", "Thermochemistry", "Analytical Chemistry"]
+  },
+  {
+    "id": "biology",
+    "name": "Biology",
+    "icon": "Leaf",
+    "color": "#10b981",
+    "bg": "#ecfdf5",
+    "tags": [],
+    "subtopics": ["Cell Biology", "Genetics", "Ecology", "Evolution", "Anatomy", "Microbiology", "Botany", "Zoology", "Biochemistry"]
+  },
+  {
+    "id": "history",
+    "name": "History",
+    "icon": "Landmark",
+    "color": "#f59e0b",
+    "bg": "#fffbeb",
+    "tags": [],
+    "subtopics": ["Ancient History", "Medieval History", "Modern History", "World Wars", "American History", "European History", "Asian History", "African History", "Cold War"]
+  },
+  {
+    "id": "geography",
+    "name": "Geography",
+    "icon": "Globe",
+    "color": "#3b82f6",
+    "bg": "#eff6ff",
+    "tags": [],
+    "subtopics": ["Physical Geography", "Human Geography", "Climatology", "Cartography", "Geopolitics", "Environmental Geography", "Urban Geography"]
+  },
+  {
+    "id": "literature",
+    "name": "Literature",
+    "icon": "BookOpen",
+    "color": "#ef4444",
+    "bg": "#fef2f2",
+    "tags": [],
+    "subtopics": ["Poetry", "Fiction", "Drama", "Non-Fiction", "World Literature", "Literary Theory", "American Literature", "British Literature"]
+  },
+  {
+    "id": "computer_science",
+    "name": "Computer Science",
+    "icon": "Code",
+    "color": "#06b6d4",
+    "bg": "#ecfeff",
+    "tags": ["statistics", "pandas", "sql"],
+    "subtopics": ["Algorithms", "Data Structures", "Networks", "Databases", "Operating Systems", "Machine Learning", "Web Development", "Cybersecurity", "Software Engineering", "Programming Languages"]
+  },
+  {
+    "id": "economics",
+    "name": "Economics",
+    "icon": "TrendingUp",
+    "color": "#f97316",
+    "bg": "#fff7ed",
+    "tags": [],
+    "subtopics": ["Microeconomics", "Macroeconomics", "International Trade", "Behavioral Economics", "Development Economics", "Financial Markets"]
+  },
+  {
+    "id": "psychology",
+    "name": "Psychology",
+    "icon": "Brain",
+    "color": "#a855f7",
+    "bg": "#faf5ff",
+    "tags": [],
+    "subtopics": ["Cognitive Psychology", "Social Psychology", "Developmental Psychology", "Clinical Psychology", "Neuroscience", "Behavioral Psychology"]
+  },
+  {
+    "id": "art",
+    "name": "Art & Design",
+    "icon": "Palette",
+    "color": "#f43f5e",
+    "bg": "#fff1f2",
+    "tags": [],
+    "subtopics": ["Art History", "Visual Design", "Color Theory", "Photography", "Sculpture", "Painting Techniques"]
+  },
+  {
+    "id": "music",
+    "name": "Music",
+    "icon": "Music",
+    "color": "#14b8a6",
+    "bg": "#f0fdfa",
+    "tags": [],
+    "subtopics": ["Music Theory", "Music History", "Harmony", "Rhythm", "Composition", "World Music"]
+  },
+  {
+    "id": "languages",
+    "name": "Languages",
+    "icon": "Languages",
+    "color": "#64748b",
+    "bg": "#f8fafc",
+    "tags": [],
+    "subtopics": ["Grammar", "Vocabulary", "Etymology", "Linguistics", "Phonology", "Semantics", "Pragmatics"]
+  },
+  {
+    "id": "philosophy",
+    "name": "Philosophy",
+    "icon": "BookOpen",
+    "color": "#7c3aed",
+    "bg": "#f5f3ff",
+    "tags": [],
+    "subtopics": ["Ethics", "Metaphysics", "Logic", "Epistemology", "Political Philosophy", "Philosophy of Mind"]
+  }
+]

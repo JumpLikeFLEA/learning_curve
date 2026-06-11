@@ -1,0 +1,276 @@
+"use client";
+
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  Atom,
+  BookOpen,
+  Brain,
+  Calculator,
+  Code,
+  FlaskConical,
+  Globe,
+  Languages,
+  Landmark,
+  Leaf,
+  Music,
+  Palette,
+  Shuffle,
+  TrendingUp,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+
+import type { Difficulty } from "@/types";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Calculator,
+  Atom,
+  FlaskConical,
+  Leaf,
+  Landmark,
+  Globe,
+  BookOpen,
+  Code,
+  TrendingUp,
+  Brain,
+  Palette,
+  Music,
+  Languages,
+};
+
+export type SubjectCardData = {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  bg: string;
+  questionCount: number;
+  difficulties: Difficulty[];
+};
+
+const DIFFICULTY_STYLES: Record<
+  Difficulty,
+  { active: string; label: string }
+> = {
+  easy: {
+    active:
+      "text-emerald-600 bg-emerald-50 border-emerald-200 hover:bg-emerald-100",
+    label: "Easy",
+  },
+  medium: {
+    active:
+      "text-amber-600 bg-amber-50 border-amber-200 hover:bg-amber-100",
+    label: "Medium",
+  },
+  hard: {
+    active: "text-red-600 bg-red-50 border-red-200 hover:bg-red-100",
+    label: "Hard",
+  },
+};
+
+const ALL_DIFFICULTIES: Difficulty[] = ["easy", "medium", "hard"];
+
+function SubjectCard({
+  subject,
+  selectedDiff,
+  onSelectDiff,
+  onStart,
+  loading,
+  index,
+}: {
+  subject: SubjectCardData;
+  selectedDiff: Difficulty | null;
+  onSelectDiff: (id: string, diff: Difficulty) => void;
+  onStart: (id: string, diff: Difficulty) => void;
+  loading: boolean;
+  index: number;
+}) {
+  const Icon = ICON_MAP[subject.icon] ?? BookOpen;
+  const hasQuestions = subject.questionCount > 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: index * 0.03 }}
+      className="group flex flex-col rounded-2xl border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+    >
+      {/* Subject header */}
+      <div className="flex items-center gap-3 p-4 pb-3">
+        <div
+          className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
+          style={{ backgroundColor: subject.bg, color: subject.color }}
+        >
+          <Icon size={20} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-foreground truncate">{subject.name}</p>
+          <p className="text-xs text-muted-foreground">
+            {subject.questionCount === 0
+              ? "No questions yet"
+              : `${subject.questionCount} question${subject.questionCount !== 1 ? "s" : ""}`}
+          </p>
+        </div>
+      </div>
+
+      {/* Difficulty selector */}
+      <div className="px-4 pb-3">
+        <p className="text-xs text-muted-foreground mb-2">Difficulty</p>
+        <div className="flex gap-1.5">
+          {ALL_DIFFICULTIES.map((diff) => {
+            const style = DIFFICULTY_STYLES[diff];
+            const isAvailable = subject.difficulties.includes(diff);
+            const isSelected = selectedDiff === diff;
+            return (
+              <button
+                key={diff}
+                disabled={!isAvailable || !hasQuestions}
+                onClick={() => onSelectDiff(subject.id, diff)}
+                className={`flex-1 px-2 py-1.5 rounded-lg border text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                  isSelected
+                    ? style.active + " border-current"
+                    : "border-border text-muted-foreground hover:border-border hover:bg-accent"
+                }`}
+              >
+                {style.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Start button */}
+      <div className="px-4 pb-4 mt-auto">
+        <button
+          disabled={!hasQuestions || loading}
+          onClick={() =>
+            onStart(subject.id, selectedDiff ?? "medium")
+          }
+          className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#4f46e5] text-white hover:bg-[#4338ca] transition-colors text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Zap size={14} />
+          {loading ? "Starting…" : "Start Quiz"}
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+export function SubjectGrid({ subjects }: { subjects: SubjectCardData[] }) {
+  const router = useRouter();
+  const [query, setQuery] = React.useState("");
+  const [loadingId, setLoadingId] = React.useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = React.useState<
+    Record<string, Difficulty>
+  >({});
+
+  const filtered = query.trim()
+    ? subjects.filter((s) =>
+        s.name.toLowerCase().includes(query.trim().toLowerCase()),
+      )
+    : subjects;
+
+  function selectDiff(subjectId: string, diff: Difficulty) {
+    setSelectedDifficulty((prev) => ({ ...prev, [subjectId]: diff }));
+  }
+
+  async function startQuiz(subjectId: string, difficulty: Difficulty) {
+    setLoadingId(subjectId);
+    try {
+      const res = await fetch("/api/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: subjectId,
+          difficulty,
+          size: 10,
+          mode: "ordinary",
+        }),
+      });
+      const data = (await res.json()) as { id?: string; error?: string };
+      if (!res.ok || !data.id) {
+        alert(data.error ?? "Could not start quiz.");
+        return;
+      }
+      router.push(`/quiz/${data.id}`);
+    } finally {
+      setLoadingId(null);
+    }
+  }
+
+  async function startRandom() {
+    setLoadingId("__random__");
+    try {
+      const res = await fetch("/api/quiz", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ difficulty: "mixed", size: 10, mode: "ordinary" }),
+      });
+      const data = (await res.json()) as { id?: string; error?: string };
+      if (!res.ok || !data.id) {
+        alert(data.error ?? "Could not start quiz.");
+        return;
+      }
+      router.push(`/quiz/${data.id}`);
+    } finally {
+      setLoadingId(null);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Header */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-foreground">Basic Quizzes</h1>
+            <p className="text-muted-foreground mt-1">
+              10 questions per quiz · Select a subject and difficulty to begin
+            </p>
+          </div>
+          <button
+            onClick={startRandom}
+            disabled={loadingId === "__random__"}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#4f46e5] text-white hover:bg-[#4338ca] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            <Shuffle size={16} />
+            Random Quiz
+          </button>
+        </div>
+
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search subjects..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="w-full max-w-sm px-4 py-2.5 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-[#4f46e5]/30 focus:border-[#4f46e5] transition-all"
+        />
+      </div>
+
+      {/* Grid */}
+      {filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+          <BookOpen size={40} className="mb-3 opacity-30" />
+          <p>No subjects match &ldquo;{query}&rdquo;</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map((s, i) => (
+            <SubjectCard
+              key={s.id}
+              subject={s}
+              selectedDiff={selectedDifficulty[s.id] ?? null}
+              onSelectDiff={selectDiff}
+              onStart={startQuiz}
+              loading={loadingId === s.id}
+              index={i}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
