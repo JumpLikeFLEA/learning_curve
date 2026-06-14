@@ -22,7 +22,7 @@ export default async function BuildPage() {
   });
 
   const subtopicsBySubject = Object.fromEntries(
-    subjects.map((s) => [s.id, s.subtopics]),
+    subjects.map((s) => [s.id, s.subtopics ?? []]),
   );
 
   return (

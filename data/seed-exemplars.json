@@ -1,0 +1,50 @@
+[
+  {
+    "id": "exemplar-da-001",
+    "type": "multiple_choice",
+    "subject": "Data Analysis",
+    "tags": ["Pandas"],
+    "difficulty": "easy",
+    "question": "In pandas, which DataFrame method returns a statistical summary of numeric columns, including count, mean, standard deviation, min, max, and quartiles?",
+    "options": [
+      "df.info()",
+      "df.describe()",
+      "df.summary()",
+      "df.stats()"
+    ],
+    "correct_answer": "df.describe()",
+    "explanation": "The describe() method returns a statistical summary of a DataFrame's numeric columns: count, mean, standard deviation, min, max, and the 25/50/75 percentiles. By default it operates only on numeric dtypes; for non-numeric columns it returns count, number of unique values, the most frequent value, and that value's frequency. A closely related method, df.info(), returns structural metadata about a DataFrame instead — column dtypes, non-null counts, and memory usage — which is useful for inspecting the shape of the data rather than its distribution."
+  },
+  {
+    "id": "exemplar-da-002",
+    "type": "multiple_choice",
+    "subject": "Data Analysis",
+    "tags": ["Descriptive Statistics"],
+    "difficulty": "easy",
+    "question": "Which of the following best describes the standard deviation of a dataset?",
+    "options": [
+      "The average value of the dataset",
+      "The square root of the variance",
+      "The difference between the maximum and minimum values",
+      "The value that appears most frequently"
+    ],
+    "correct_answer": "The square root of the variance",
+    "explanation": "The standard deviation is defined as the square root of the variance, where the variance is the average of the squared differences between each data point and the mean: σ² = (1/n) Σ(xᵢ − μ)². Taking the square root gives σ, which represents the typical distance of a data point from the mean. The key advantage over variance is units: because variance squares the deviations, it is expressed in squared units of the original data (e.g., squared dollars), whereas the standard deviation is in the original units (dollars), which makes it directly interpretable."
+  },
+  {
+    "id": "exemplar-da-003",
+    "type": "multiple_choice",
+    "subject": "Data Analysis",
+    "tags": ["Sampling and Bias"],
+    "difficulty": "easy",
+    "question": "In statistics, what is the difference between a population and a sample?",
+    "options": [
+      "A population is the complete set of items being studied; a sample is a subset drawn from it",
+      "A population is the dataset before cleaning; a sample is the dataset after cleaning",
+      "A population refers to everyone targeted by a survey; a sample refers to those who actually responded",
+      "A population is the true statistical parameter; a sample is the estimate calculated from data"
+    ],
+    "correct_answer": "A population is the complete set of items being studied; a sample is a subset drawn from it",
+    "explanation": "In statistics, the population is the entire group of subjects, observations, or measurements of interest in a particular study — for example, all adults in a country, all transactions made on a website in 2023, or all manufactured parts in a factory's output. A sample is a subset of the population, typically selected because measuring the entire population is impractical or impossible. Statistical inference is the process of using properties calculated from the sample (the sample mean, sample variance, etc.) to estimate the corresponding properties of the population."
+  }
+]

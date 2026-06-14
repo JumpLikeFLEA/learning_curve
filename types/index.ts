@@ -72,7 +72,7 @@ export interface Subject {
   color: string;
   bg: string;
   tags: string[]; // which tags in questions.json belong to this subject
-  subtopics: string[]; // display labels for the advanced quiz wizard
+  subtopics?: string[]; // display labels for the advanced quiz wizard
 }
 
 export type SchemaVersion = {

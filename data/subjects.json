@@ -124,5 +124,21 @@
     "bg": "#f5f3ff",
     "tags": [],
     "subtopics": ["Ethics", "Metaphysics", "Logic", "Epistemology", "Political Philosophy", "Philosophy of Mind"]
+  },
+  {
+    "id": "data_analysis",
+    "name": "Data Analysis",
+    "icon": "BarChart3",
+    "color": "#0ea5e9",
+    "bg": "#f0f9ff",
+    "tags": [],
+    "subtopics": [
+      "Descriptive Statistics",
+      "Probability Distributions",
+      "Hypothesis Testing",
+      "Correlation and Regression",
+      "Sampling and Bias",
+      "Pandas"
+    ]
   }
 ]

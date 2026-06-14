@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  const authRoutes = ['/login', '/signup']
+  const authRoutes = ['/login', '/signup', '/auth/callback']
   const isAuthRoute = authRoutes.includes(pathname)
 
   if (!user && !isAuthRoute) {
