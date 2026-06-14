@@ -23,7 +23,7 @@ import {
 
 import { Button } from "@/app/components/ui/button";
 import { Checkbox } from "@/app/components/ui/checkbox";
-import { cn } from "@/lib/utils";
+import { cn, slugifyForTag } from "@/lib/utils";
 import type { Difficulty, QuizMode, QuizSize } from "@/types";
 import type { SubjectCardData } from "@/app/components/SubjectGrid";
 
@@ -349,7 +349,7 @@ export default function BuildForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subject: state.subjectId,
-          tags: state.subtopics,
+          tags: state.subtopics.map(slugifyForTag),
           difficulty: state.difficulty,
           size: state.size,
           mode: state.mode,

@@ -131,7 +131,14 @@
     "icon": "BarChart3",
     "color": "#0ea5e9",
     "bg": "#f0f9ff",
-    "tags": [],
+    "tags": [
+      "descriptive statistics",
+      "probability distributions",
+      "hypothesis testing",
+      "correlation and regression",
+      "sampling and bias",
+      "pandas"
+    ],
     "subtopics": [
       "Descriptive Statistics",
       "Probability Distributions",
