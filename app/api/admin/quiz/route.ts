@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
         created_at: now,
         source: "manual" as const,
         created_by: user.id,
+        status: "pending" as const,
       };
     });
 

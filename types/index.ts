@@ -4,6 +4,15 @@ export type Difficulty = "easy" | "medium" | "hard";
 
 export type QuestionSource = "manual" | "ai_generated";
 
+export type ReviewStatus = "pending" | "approved" | "rejected";
+
+export interface QuestionCriticNotes {
+  correctness_check: "pass" | "fail" | "unsure";
+  ambiguity_check: "pass" | "fail" | "unsure";
+  distractor_quality: number;
+  notes: string;
+}
+
 export interface Question {
   id: string;
   type: QuestionType;
@@ -17,6 +26,12 @@ export interface Question {
   created_at: string;
   source: QuestionSource;
   created_by?: string | null;
+  status: ReviewStatus;
+  critic_notes?: QuestionCriticNotes | null;
+  content_hash?: string | null;
+  generation_batch_id?: string | null;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
 }
 
 export interface Quiz {

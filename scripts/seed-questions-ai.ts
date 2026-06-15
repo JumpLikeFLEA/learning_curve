@@ -2,15 +2,15 @@
  * AI question generator CLI seeder.
  *
  * Usage:
- *   npx tsx scripts/seed-questions-ai.ts \
+ *   npx tsx --env-file=.env.local scripts/seed-questions-ai.ts \
  *     --subject "Data Analysis" \
  *     --difficulty easy \
  *     --subtopics "Pandas,Descriptive Statistics" \
  *     --count 5 \
  *     --notes "focus on real-world scenarios"
  *
- * Requires: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
- *           ANTHROPIC_API_KEY in .env.local.
+ * --env-file=.env.local is required: tsx does not load .env files automatically.
+ * Requires: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY.
  */
 
 import { createClient } from "@supabase/supabase-js";

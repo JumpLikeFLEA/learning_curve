@@ -18,6 +18,26 @@ export async function getQuestions(): Promise<Question[]> {
   return (data ?? []) as Question[];
 }
 
+export async function getPendingQuestions(
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<{ questions: Question[]; total: number }> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  const { data, error, count } = await supabase
+    .from("questions")
+    .select("*", { count: "exact" })
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .range(from, to);
+  if (error) throw new Error(error.message);
+  return {
+    questions: (data ?? []) as Question[],
+    total: count ?? 0,
+  };
+}
+
 export async function getQuizById(id: string): Promise<Quiz | undefined> {
   const supabase = await createClient();
   const { data, error } = await supabase

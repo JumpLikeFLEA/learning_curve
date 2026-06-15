@@ -12,6 +12,7 @@ import {
   PlusSquare,
   Settings2,
   Shield,
+  ShieldCheck,
   Shuffle,
   Trophy,
 } from "lucide-react";
@@ -34,12 +35,20 @@ const navItems = [
   { label: "Achievements", description: "Badges & rewards", href: "/achievements", icon: Trophy },
 ];
 
-const adminItem = {
-  label: "Admin",
-  description: "Quiz builder",
-  href: "/admin/quiz-builder",
-  icon: Shield,
-};
+const adminItems = [
+  {
+    label: "Quiz Builder",
+    description: "Author manual questions",
+    href: "/admin/quiz-builder",
+    icon: Shield,
+  },
+  {
+    label: "Review Queue",
+    description: "Review AI-generated questions",
+    href: "/admin/review",
+    icon: ShieldCheck,
+  },
+];
 
 type UserProfile = {
   displayName: string;
@@ -123,7 +132,7 @@ export function AppSidebar() {
     router.refresh();
   }
 
-  const items = isAdmin ? [...navItems, adminItem] : navItems;
+  const items = navItems;
 
   async function handleRandomQuiz() {
     try {
@@ -197,8 +206,52 @@ export function AppSidebar() {
           })}
         </nav>
 
+        {/* Admin */}
+        {isAdmin && (
+          <div className="mt-4 group-data-[collapsible=icon]:hidden">
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-3 mb-2">
+              Admin
+            </p>
+            <nav className="flex flex-col gap-1">
+              {adminItems.map(({ label, description, href, icon: Icon }) => {
+                const active = pathname.startsWith(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
+                      active
+                        ? "bg-[#eef2ff] text-[#4f46e5]"
+                        : "text-foreground hover:bg-accent",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "flex items-center justify-center w-8 h-8 rounded-lg transition-all shrink-0",
+                        active
+                          ? "bg-[#4f46e5] text-white"
+                          : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      <Icon size={16} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium leading-none truncate">{label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 truncate">{description}</p>
+                    </div>
+                    {active && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#4f46e5] shrink-0" />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+
         {/* Quick Actions */}
-        <div className="mt-4 pt-4 border-t border-sidebar-border group-data-[collapsible=icon]:hidden">
+        <div className="mt-4 group-data-[collapsible=icon]:hidden">
           <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider px-3 mb-2">
             Quick Actions
           </p>

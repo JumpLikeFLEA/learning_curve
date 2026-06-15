@@ -221,7 +221,7 @@ export default function DashboardPage() {
                 <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} domain={[50, 100]} />
                 <Tooltip
                   contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: "13px" }}
-                  formatter={(v: number) => [`${v}%`, "Score"]}
+                  formatter={(v) => [`${v}%`, "Score"]}
                 />
                 <Area type="monotone" dataKey="score" stroke="#4f46e5" strokeWidth={2} fill="url(#scoreGrad)" dot={{ fill: "#4f46e5", r: 4 }} />
               </AreaChart>
