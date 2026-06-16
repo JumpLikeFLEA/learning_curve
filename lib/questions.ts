@@ -1,6 +1,8 @@
 import path from "path";
 import fs from "fs";
-import { Question, Quiz, Result, QuizFilter, Subject } from "@/types";
+import { unstable_cache } from "next/cache";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
+import { Question, Quiz, Result, QuizFilter, Subject, Difficulty } from "@/types";
 import { createClient } from "@/lib/supabase/server";
 
 // subjects.json stays on disk — it's static config, not user data
@@ -17,6 +19,41 @@ export async function getQuestions(): Promise<Question[]> {
   if (error) throw new Error(error.message);
   return (data ?? []) as Question[];
 }
+
+const DIFF_ORDER: Difficulty[] = ["easy", "medium", "hard"];
+
+export const getSubjectStats = unstable_cache(
+  async (): Promise<Record<string, { count: number; difficulties: Difficulty[] }>> => {
+    // Cannot use createClient() here — it calls cookies() which is forbidden inside unstable_cache.
+    // The anon key hits the same RLS policies; no service-role bypass.
+    const supabase = createAnonClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    const { data, error } = await supabase
+      .from("questions")
+      .select("subject, difficulty")
+      .eq("status", "approved");
+    if (error) throw new Error(error.message);
+
+    const map: Record<string, { count: number; diffSet: Set<Difficulty> }> = {};
+    for (const row of data ?? []) {
+      const entry = map[row.subject] ?? { count: 0, diffSet: new Set() };
+      entry.count += 1;
+      entry.diffSet.add(row.difficulty as Difficulty);
+      map[row.subject] = entry;
+    }
+
+    return Object.fromEntries(
+      Object.entries(map).map(([subject, { count, diffSet }]) => [
+        subject,
+        { count, difficulties: DIFF_ORDER.filter((d) => diffSet.has(d)) },
+      ])
+    );
+  },
+  ["subject-stats-v1"],
+  { revalidate: 60, tags: ["subject-stats"] }
+);
 
 export async function getPendingQuestions(
   page: number = 1,

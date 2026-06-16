@@ -1,7 +1,6 @@
 import { SidebarProvider } from "@/app/components/ui/sidebar";
 import { AppSidebar } from "@/app/components/AppSidebar";
 import { Topbar } from "@/app/components/Topbar";
-import { PageTransition } from "@/app/components/PageTransition";
 
 export default function MainLayout({
   children,
@@ -15,7 +14,7 @@ export default function MainLayout({
         <Topbar />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto px-5 py-8">
-            <PageTransition>{children}</PageTransition>
+            {children}
           </div>
         </main>
       </div>

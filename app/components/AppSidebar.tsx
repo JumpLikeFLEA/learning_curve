@@ -177,6 +177,7 @@ export function AppSidebar() {
               <Link
                 key={href}
                 href={href}
+                prefetch={true}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all group-data-[collapsible=icon]:justify-center",
                   active
@@ -219,6 +220,7 @@ export function AppSidebar() {
                   <Link
                     key={href}
                     href={href}
+                    prefetch={true}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all",
                       active
