@@ -26,7 +26,7 @@ The `app/` directory uses two route groups:
 - `(auth)` — `/login`, `/signup`. Public.
 - `(main)` — everything else: home, build, custom, quiz, results, dashboard, achievements, admin. All gated.
 
-`middleware.ts` runs on every request: it refreshes the Supabase session and redirects unauthenticated users to `/login`. Admin-only routes additionally verify `profiles.role === 'admin'` server-side inside the route handler — never trust client-side role claims.
+`proxy.ts` runs on every request: it refreshes the Supabase session and redirects unauthenticated users to `/login`. Admin-only routes additionally verify `profiles.role === 'admin'` server-side inside the route handler — never trust client-side role claims.
 
 ### Data layout
 Two stores, each owning a different kind of state:
@@ -134,7 +134,7 @@ learning_curve/
 │   ├── supabase/                   SSR client + browser client
 │   ├── use-mobile.ts               useIsMobile() hook
 │   └── utils.ts                    cn() helper (clsx + tailwind-merge)
-├── middleware.ts                   Session refresh + auth gating
+├── proxy.ts                        Session refresh + auth gating
 ├── public/                         Static assets
 ├── scripts/
 │   └── seed-questions.ts           One-off CLI seeder (data/questions.json → Supabase)

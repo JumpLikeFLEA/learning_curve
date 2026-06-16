@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -72,6 +72,7 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
   const [showExplanation, setShowExplanation] = useState(false);
   const [reviewExpanded, setReviewExpanded] = useState<number | null>(null);
   const timer = useTimer();
+  const submittedRef = useRef(false);
 
   const subjectId = questions[0]?.subject ?? "mathematics";
   const difficulty = quiz.difficulty_mix === "mixed" ? "medium" : quiz.difficulty_mix;
@@ -105,6 +106,35 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
     setPhase("feedback");
   };
 
+  const submitResult = async () => {
+    if (submittedRef.current) return;
+    submittedRef.current = true;
+    try {
+      const answerRecords = questions.map((q, i) => {
+        const ans = answers[i];
+        return {
+          questionId: q.id,
+          userAnswer: ans !== null ? q.options[ans] : "",
+          correct: ans !== null && q.options[ans] === q.correct_answer,
+        };
+      });
+      await fetch("/api/results", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          quizId: quiz.id,
+          answers: answerRecords,
+          timeTaken: timer.seconds,
+        }),
+      });
+      // No router.refresh() here: it only clears the client cache for the *current*
+      // (quiz) route, not for /dashboard or /achievements. Those pages are dynamic
+      // (auth via cookies), so they re-fetch fresh data on navigation regardless.
+    } catch (e) {
+      console.error("Failed to save quiz result", e);
+    }
+  };
+
   const handleNext = () => {
     if (currentIndex < totalQuestions - 1) {
       setCurrentIndex(i => i + 1);
@@ -114,6 +144,7 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
     } else {
       timer.stop();
       setPhase("results");
+      submitResult();
     }
   };
 
@@ -122,6 +153,7 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
   };
 
   const handleRetry = () => {
+    submittedRef.current = false;
     const shuffled = [...initialQuestions].sort(() => Math.random() - 0.5);
     setQuestions(shuffled);
     setCurrentIndex(0);

@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 import { unstable_cache } from "next/cache";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { Question, Quiz, Result, QuizFilter, Subject, Difficulty } from "@/types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -162,6 +163,57 @@ export async function getAllTags(): Promise<string[]> {
   const tagSet = new Set<string>();
   (data ?? []).forEach((row: { tags: string[] }) => row.tags.forEach((t) => tagSet.add(t)));
   return Array.from(tagSet).sort();
+}
+
+export type EnrichedResult = {
+  id: string;
+  mode: string;
+  score: number;
+  correct: number;
+  total_questions: number;
+  taken_at: string;
+  time_taken: number;
+  subject: string;
+  difficulty: string;
+};
+
+export async function getEnrichedResults(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<EnrichedResult[]> {
+  const { data: results, error } = await supabase
+    .from("results")
+    .select("*")
+    .eq("user_id", userId)
+    .order("taken_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+
+  const allQuestions = await getQuestions();
+  const subjects = getSubjects();
+  const subjectMap = new Map(subjects.map((s) => [s.id, s.name]));
+
+  return Promise.all(
+    (results ?? []).map(async (r) => {
+      const quiz = await getQuizById(r.quiz_id);
+      let subject = "Mixed";
+      if (quiz) {
+        const firstQ = allQuestions.find((q) => q.id === quiz.question_ids[0]);
+        if (firstQ?.subject) subject = subjectMap.get(firstQ.subject) ?? firstQ.subject;
+      }
+      return {
+        id: r.id,
+        mode: r.mode,
+        score: r.score,
+        correct: r.correct,
+        total_questions: r.total_questions,
+        taken_at: r.taken_at,
+        time_taken: r.time_taken,
+        subject,
+        difficulty: quiz?.difficulty_mix ?? "mixed",
+      };
+    }),
+  );
 }
 
 function shuffle<T>(arr: T[]): T[] {

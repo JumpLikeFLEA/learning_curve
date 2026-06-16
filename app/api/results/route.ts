@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getQuizById, getQuestions, getSubjects } from "@/lib/questions";
+import { getQuizById, getQuestions, getSubjects, getEnrichedResults } from "@/lib/questions";
 import { scoreQuiz } from "@/lib/scoring";
 import { createClient } from "@/lib/supabase/server";
 import { ACHIEVEMENTS, checkAchievements, calcBonusXP, type ResultSummary } from "@/lib/achievements";
@@ -35,40 +35,7 @@ export async function GET() {
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { data: results, error } = await supabase
-      .from("results")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("taken_at", { ascending: false });
-
-    if (error) throw new Error(error.message);
-
-    const allQuestions = await getQuestions();
-    const subjects = getSubjects();
-    const subjectMap = new Map(subjects.map((s) => [s.id, s.name]));
-
-    const enriched = await Promise.all(
-      (results ?? []).map(async (r) => {
-        const quiz = await getQuizById(r.quiz_id);
-        let subject = "Mixed";
-        if (quiz) {
-          const firstQ = allQuestions.find((q) => q.id === quiz.question_ids[0]);
-          if (firstQ?.subject) subject = subjectMap.get(firstQ.subject) ?? firstQ.subject;
-        }
-        return {
-          id: r.id,
-          mode: r.mode,
-          score: r.score,
-          correct: r.correct,
-          total_questions: r.total_questions,
-          taken_at: r.taken_at,
-          time_taken: r.time_taken,
-          subject,
-          difficulty: quiz?.difficulty_mix ?? "mixed",
-        };
-      })
-    );
-
+    const enriched = await getEnrichedResults(supabase, user.id);
     return NextResponse.json(enriched);
   } catch (e) {
     console.error(e);
