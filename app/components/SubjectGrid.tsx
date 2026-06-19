@@ -19,6 +19,7 @@ import {
   Shuffle,
   TrendingUp,
   Zap,
+  AlertCircle,
   type LucideIcon,
 } from "lucide-react";
 
@@ -89,6 +90,7 @@ function SubjectCard({
 }) {
   const Icon = ICON_MAP[subject.icon] ?? BookOpen;
   const hasQuestions = subject.questionCount > 0;
+  const [warn, setWarn] = React.useState(false);
 
   return (
     <motion.div
@@ -127,7 +129,7 @@ function SubjectCard({
               <button
                 key={diff}
                 disabled={!isAvailable || !hasQuestions}
-                onClick={() => onSelectDiff(subject.id, diff)}
+                onClick={() => { onSelectDiff(subject.id, diff); setWarn(false); }}
                 className={`flex-1 px-2 py-1.5 rounded-lg border text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                   isSelected
                     ? style.active + " border-current"
@@ -143,11 +145,22 @@ function SubjectCard({
 
       {/* Start button */}
       <div className="px-4 pb-4 mt-auto">
+        {warn && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-1.5 mb-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5"
+          >
+            <AlertCircle size={13} className="shrink-0" />
+            Choose a difficulty above to start.
+          </motion.p>
+        )}
         <button
           disabled={!hasQuestions || loading}
-          onClick={() =>
-            onStart(subject.id, selectedDiff ?? "medium")
-          }
+          onClick={() => {
+            if (!selectedDiff) { setWarn(true); return; }
+            onStart(subject.id, selectedDiff);
+          }}
           className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#4f46e5] text-white hover:bg-[#4338ca] transition-colors text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Zap size={14} />

@@ -85,7 +85,13 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
   const submittedRef = useRef(false);
 
   const subjectId = questions[0]?.subject ?? "mathematics";
-  const difficulty = quiz.difficulty_mix === "mixed" ? "medium" : quiz.difficulty_mix;
+  const difficulty =
+    quiz.difficulty_mix !== "mixed"
+      ? quiz.difficulty_mix
+      : (() => {
+          const diffs = new Set(questions.map((q) => q.difficulty));
+          return diffs.size === 1 ? [...diffs][0] : "mixed";
+        })();
   const questionCount = questions.length;
 
   const subject = SUBJECTS.find(s => s.id === subjectId);
@@ -178,11 +184,11 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
 
   const isCorrect = selectedOption !== null && correctIdx !== -1 && selectedOption === correctIdx;
 
-  const difficultyColor = {
+  const difficultyColor: string = ({
     easy: "#10b981",
     medium: "#f59e0b",
     hard: "#ef4444",
-  }[difficulty] ?? "#6366f1";
+  } as Record<string, string>)[difficulty] ?? "#6366f1";
 
   if (phase === "results") {
     return (

@@ -297,7 +297,7 @@ export function DashboardView({ userId, email, profile, results }: DashboardView
             <span className="text-xs text-muted-foreground px-2 py-1 rounded-lg bg-accent">This week</span>
           </div>
           <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 300, height: 192 }}>
               <AreaChart data={weeklyData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
@@ -325,7 +325,7 @@ export function DashboardView({ userId, email, profile, results }: DashboardView
             <p className="text-xs text-muted-foreground">Performance by subject</p>
           </div>
           <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 300, height: 192 }}>
               <RadarChart data={subjectRadar}>
                 <PolarGrid stroke="#e5e7eb" />
                 <PolarAngleAxis dataKey="subject" tick={{ fontSize: 11 }} />
