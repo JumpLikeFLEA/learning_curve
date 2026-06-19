@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getQuizById, getQuestions } from "@/lib/questions";
+import { shuffleOptions } from "@/lib/shuffleOptions";
 import QuizSession from "./QuizSession";
 import type { Question, Quiz } from "@/types";
 
@@ -15,5 +16,10 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
 
   if (questions.length === 0) notFound();
 
-  return <QuizSession quiz={quiz as Quiz} questions={questions} />;
+  const shuffledQuestions = questions.map((q) => ({
+    ...q,
+    options: shuffleOptions(q.options, `${id}:${q.id}`) as [string, string, string, string],
+  }));
+
+  return <QuizSession quiz={quiz as Quiz} questions={shuffledQuestions} />;
 }

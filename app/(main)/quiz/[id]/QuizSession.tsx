@@ -35,6 +35,15 @@ interface Props {
   questions: Question[];
 }
 
+type SubmissionResult = {
+  id: string;
+  xp: number;
+  correctCount: number;
+  total: number;
+  score: number;
+  newAchievements: string[];
+};
+
 type Phase = "quiz" | "feedback" | "results";
 
 function useTimer() {
@@ -71,6 +80,7 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
   const [answers, setAnswers] = useState<(number | null)[]>(Array(initialQuestions.length).fill(null));
   const [showExplanation, setShowExplanation] = useState(false);
   const [reviewExpanded, setReviewExpanded] = useState<number | null>(null);
+  const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
   const timer = useTimer();
   const submittedRef = useRef(false);
 
@@ -92,7 +102,6 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
     a !== null && questions[i].options[a] === questions[i].correct_answer
   ).length;
   const scorePercent = Math.round((correctCount / totalQuestions) * 100);
-  const xpEarned = correctCount * 10 + (scorePercent >= 80 ? 50 : 0);
   const grade = getGrade(scorePercent);
 
   const handleSelect = (optionIndex: number) => {
@@ -115,10 +124,9 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
         return {
           questionId: q.id,
           userAnswer: ans !== null ? q.options[ans] : "",
-          correct: ans !== null && q.options[ans] === q.correct_answer,
         };
       });
-      await fetch("/api/results", {
+      const res = await fetch("/api/results", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -127,9 +135,12 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
           timeTaken: timer.seconds,
         }),
       });
-      // No router.refresh() here: it only clears the client cache for the *current*
-      // (quiz) route, not for /dashboard or /achievements. Those pages are dynamic
-      // (auth via cookies), so they re-fetch fresh data on navigation regardless.
+      if (!res.ok) {
+        console.error("Failed to persist quiz:", await res.text());
+        return;
+      }
+      const data: SubmissionResult = await res.json();
+      setSubmissionResult(data);
     } catch (e) {
       console.error("Failed to save quiz result", e);
     }
@@ -154,6 +165,7 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
 
   const handleRetry = () => {
     submittedRef.current = false;
+    setSubmissionResult(null);
     const shuffled = [...initialQuestions].sort(() => Math.random() - 0.5);
     setQuestions(shuffled);
     setCurrentIndex(0);
@@ -181,7 +193,7 @@ export default function QuizSession({ quiz, questions: initialQuestions }: Props
         total={totalQuestions}
         scorePercent={scorePercent}
         timeFormatted={timer.formatted}
-        xpEarned={xpEarned}
+        submissionResult={submissionResult}
         grade={grade}
         subject={subject}
         difficulty={difficulty}
@@ -388,7 +400,7 @@ interface ResultsScreenProps {
   total: number;
   scorePercent: number;
   timeFormatted: string;
-  xpEarned: number;
+  submissionResult: SubmissionResult | null;
   grade: ReturnType<typeof getGrade>;
   subject: (typeof SUBJECTS)[0] | undefined;
   difficulty: string;
@@ -400,10 +412,12 @@ interface ResultsScreenProps {
 
 function ResultsScreen({
   questions, answers, score, total, scorePercent, timeFormatted,
-  xpEarned, grade, subject, difficulty, reviewExpanded, setReviewExpanded,
+  submissionResult, grade, subject, difficulty, reviewExpanded, setReviewExpanded,
   onBack, onRetry
 }: ResultsScreenProps) {
-  const wrong = total - score;
+  const displayCorrect = submissionResult?.correctCount ?? score;
+  const displayWrong = total - displayCorrect;
+  const displayXP: number | null = submissionResult?.xp ?? null;
 
   return (
     <motion.div
@@ -469,11 +483,11 @@ function ResultsScreen({
         >
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/70 backdrop-blur">
             <CheckCircle2 size={16} className="text-emerald-500" />
-            <span className="text-sm font-medium">{score} correct</span>
+            <span className="text-sm font-medium">{displayCorrect} correct</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/70 backdrop-blur">
             <XCircle size={16} className="text-red-400" />
-            <span className="text-sm font-medium">{wrong} incorrect</span>
+            <span className="text-sm font-medium">{displayWrong} incorrect</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/70 backdrop-blur">
             <Clock size={16} className="text-muted-foreground" />
@@ -481,7 +495,7 @@ function ResultsScreen({
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/70 backdrop-blur">
             <Star size={16} className="text-amber-500" />
-            <span className="text-sm font-medium">+{xpEarned} XP</span>
+            <span className="text-sm font-medium">{displayXP !== null ? `+${displayXP}` : "—"} XP</span>
           </div>
         </motion.div>
       </div>
@@ -495,7 +509,7 @@ function ResultsScreen({
       >
         {[
           { label: "Accuracy", value: `${scorePercent}%`, icon: Target, color: "#4f46e5" },
-          { label: "XP Earned", value: `+${xpEarned}`, icon: Zap, color: "#f59e0b" },
+          { label: "XP Earned", value: displayXP !== null ? `+${displayXP}` : "—", icon: Zap, color: "#f59e0b" },
           { label: "Time", value: timeFormatted, icon: Clock, color: "#10b981" },
         ].map(stat => {
           const Icon = stat.icon;
@@ -518,7 +532,7 @@ function ResultsScreen({
       >
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>Score breakdown</span>
-          <span>{score}/{total} correct</span>
+          <span>{displayCorrect}/{total} correct</span>
         </div>
         <div className="flex h-3 rounded-full overflow-hidden gap-0.5">
           {questions.map((q, i) => {

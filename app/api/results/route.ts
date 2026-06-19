@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getQuizById, getQuestions, getSubjects, getEnrichedResults } from "@/lib/questions";
-import { scoreQuiz } from "@/lib/scoring";
+import { getQuizById, getSubjects, getEnrichedResults } from "@/lib/questions";
+import { scoreQuiz, type AnswerRecord } from "@/lib/scoring";
 import { createClient } from "@/lib/supabase/server";
-import { ACHIEVEMENTS, checkAchievements, calcBonusXP, type ResultSummary } from "@/lib/achievements";
+import { checkAchievements, calcBonusXP, type ResultSummary } from "@/lib/achievements";
 import { QuizMode } from "@/types";
-
-function calcXP(correct: number, total: number, mode: QuizMode): number {
-  const base = correct * (mode === "exam" ? 15 : 10);
-  const ratio = total > 0 ? correct / total : 0;
-  const bonus = ratio >= 1 ? 50 : ratio >= 0.9 ? 25 : ratio >= 0.8 ? 10 : 0;
-  return base + bonus;
-}
 
 function calcStreak(lastQuizAt: string | null): {
   newStreak: number;
@@ -22,9 +15,9 @@ function calcStreak(lastQuizAt: string | null): {
   const today = new Date().toISOString().split("T")[0];
   const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
-  if (lastDate === today) return { newStreak: 0, streakChanged: false }; // already played today
-  if (lastDate === yesterday) return { newStreak: 1, streakChanged: true }; // extend streak
-  return { newStreak: 1, streakChanged: true }; // streak broken, reset to 1 (this quiz)
+  if (lastDate === today) return { newStreak: 0, streakChanged: false };
+  if (lastDate === yesterday) return { newStreak: 1, streakChanged: true };
+  return { newStreak: 1, streakChanged: true };
 }
 
 export async function GET() {
@@ -51,33 +44,56 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { quizId, answers, timeTaken } = await req.json();
+    const { quizId, answers, timeTaken } = await req.json() as {
+      quizId: string;
+      answers: AnswerRecord[];
+      timeTaken?: number;
+    };
 
     const quiz = await getQuizById(quizId);
     if (!quiz) return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
 
-    const allQuestions = await getQuestions();
-    const questions = quiz.question_ids
-      .map((id: string) => allQuestions.find((q) => q.id === id))
-      .filter(Boolean) as typeof allQuestions;
+    // Fetch canonical correct answers from the server — client correctness is not trusted
+    const questionIds: string[] = (answers as AnswerRecord[]).map((a) => a.questionId);
+    const { data: questionRows } = await supabase
+      .from("questions")
+      .select("id, correct_answer")
+      .in("id", questionIds);
+
+    const correctAnswers: Record<string, string> = Object.fromEntries(
+      (questionRows ?? []).map((q) => [q.id, q.correct_answer])
+    );
+
+    const missingCount = questionIds.filter((id) => !correctAnswers[id]).length;
+    if (missingCount > 0) {
+      console.warn(`scoreQuiz: ${missingCount} submitted question(s) not found in DB — treated as wrong`);
+    }
 
     const mode: QuizMode = quiz.mode ?? "ordinary";
     const result = scoreQuiz(
       quizId,
       mode,
-      questions,
       answers,
+      correctAnswers,
       typeof timeTaken === "number" ? timeTaken : undefined
     );
 
-    // Save result
-    const { error: insertError } = await supabase
-      .from("results")
-      .insert({ ...result, user_id: user.id });
+    // Persist server-computed result — never client-supplied correctness data
+    const { error: insertError } = await supabase.from("results").insert({
+      id: result.id,
+      quiz_id: result.quiz_id,
+      mode: result.mode,
+      score: result.score,
+      total_questions: result.total,
+      correct: result.correctCount,
+      tag_breakdown: result.tag_breakdown,
+      wrong_question_ids: result.wrong_question_ids,
+      grading_type: result.grading_type,
+      taken_at: result.taken_at,
+      ...(result.time_taken !== undefined && { time_taken: result.time_taken }),
+      user_id: user.id,
+    });
     if (insertError) throw new Error(insertError.message);
-
-    // XP from quiz performance
-    const quizXP = calcXP(result.correct, result.total_questions, mode);
 
     // Load profile for streak + XP update
     const { data: profile } = await supabase
@@ -108,9 +124,13 @@ export async function POST(req: NextRequest) {
 
     const subjects = getSubjects();
     const subjectMap = new Map(subjects.map((s) => [s.id, s.name]));
-    const firstQ = allQuestions.find((q) => q.id === quiz.question_ids[0]);
-    const latestSubject = firstQ?.subject
-      ? (subjectMap.get(firstQ.subject) ?? firstQ.subject)
+    const { data: firstQRow } = await supabase
+      .from("questions")
+      .select("subject")
+      .eq("id", quiz.question_ids[0])
+      .single();
+    const latestSubject = firstQRow?.subject
+      ? (subjectMap.get(firstQRow.subject) ?? firstQRow.subject)
       : "Mixed";
 
     const resultSummaries: ResultSummary[] = (allResults ?? []).map((r) => ({
@@ -118,14 +138,14 @@ export async function POST(req: NextRequest) {
       correct: r.correct,
       total_questions: r.total_questions,
       taken_at: r.taken_at,
-      subject: latestSubject, // simplified — only current subject available without joins
+      subject: latestSubject,
     }));
 
     const ctx = {
       results: resultSummaries,
       latestScore: result.score,
-      latestCorrect: result.correct,
-      latestTotal: result.total_questions,
+      latestCorrect: result.correctCount,
+      latestTotal: result.total,
       latestSubject,
       currentStreak: updatedStreak,
     };
@@ -137,7 +157,7 @@ export async function POST(req: NextRequest) {
       await supabase.from("user_achievements").upsert(rows, { onConflict: "user_id,achievement_id" });
     }
 
-    const totalNewXP = quizXP + achievementXP;
+    const totalNewXP = result.xp + achievementXP;
     const profileUpdate: Record<string, unknown> = {
       total_xp: (profile?.total_xp ?? 0) + totalNewXP,
       last_quiz_at: new Date().toISOString(),
@@ -148,7 +168,14 @@ export async function POST(req: NextRequest) {
     }
     await supabase.from("profiles").update(profileUpdate).eq("id", user.id);
 
-    return NextResponse.json({ id: result.id, xp: quizXP, newAchievements });
+    return NextResponse.json({
+      id: result.id,
+      xp: totalNewXP,
+      correctCount: result.correctCount,
+      total: result.total,
+      score: result.score,
+      newAchievements,
+    });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
