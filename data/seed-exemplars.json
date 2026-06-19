@@ -1,50 +1,51 @@
 [
   {
-    "id": "exemplar-da-001",
+    "id": "exemplar-math-logic-001",
     "type": "multiple_choice",
-    "subject": "Data Analysis",
-    "tags": ["Pandas"],
+    "subject": "Mathematics",
+    "tags": ["Logic Puzzles"],
     "difficulty": "easy",
-    "question": "In pandas, which DataFrame method returns a statistical summary of numeric columns, including count, mean, standard deviation, min, max, and quartiles?",
-    "options": [
-      "df.info()",
-      "df.describe()",
-      "df.summary()",
-      "df.stats()"
-    ],
-    "correct_answer": "df.describe()",
-    "explanation": "The describe() method returns a statistical summary of a DataFrame's numeric columns: count, mean, standard deviation, min, max, and the 25/50/75 percentiles. By default it operates only on numeric dtypes; for non-numeric columns it returns count, number of unique values, the most frequent value, and that value's frequency. A closely related method, df.info(), returns structural metadata about a DataFrame instead — column dtypes, non-null counts, and memory usage — which is useful for inspecting the shape of the data rather than its distribution."
+    "question": "In a group of 13 people, what is the minimum number guaranteed to share a birth month?",
+    "options": ["1", "2", "3", "13"],
+    "correct_answer": "2",
+    "explanation": "This is the pigeonhole principle in its simplest form. There are 12 possible birth months and 13 people. If each person were born in a different month, that would require 13 distinct months — but only 12 exist. So at least two people must share a month. More generally, distributing n items into k bins with n > k guarantees at least one bin contains ⌈n/k⌉ items; here ⌈13/12⌉ = 2. The word 'guaranteed' is essential — many real groups will have larger overlaps, but 2 is the worst-case lower bound."
   },
   {
-    "id": "exemplar-da-002",
+    "id": "exemplar-math-logic-002",
     "type": "multiple_choice",
-    "subject": "Data Analysis",
-    "tags": ["Descriptive Statistics"],
+    "subject": "Mathematics",
+    "tags": ["Logic Puzzles"],
     "difficulty": "easy",
-    "question": "Which of the following best describes the standard deviation of a dataset?",
-    "options": [
-      "The average value of the dataset",
-      "The square root of the variance",
-      "The difference between the maximum and minimum values",
-      "The value that appears most frequently"
-    ],
-    "correct_answer": "The square root of the variance",
-    "explanation": "The standard deviation is defined as the square root of the variance, where the variance is the average of the squared differences between each data point and the mean: σ² = (1/n) Σ(xᵢ − μ)². Taking the square root gives σ, which represents the typical distance of a data point from the mean. The key advantage over variance is units: because variance squares the deviations, it is expressed in squared units of the original data (e.g., squared dollars), whereas the standard deviation is in the original units (dollars), which makes it directly interpretable."
+    "question": "Three boxes are labeled 'Apples', 'Oranges', and 'Apples and Oranges'. You are told every label is wrong. You may take one fruit from one box. Which box should you pick from to determine the contents of all three with certainty?",
+    "options": ["Apples", "Oranges", "Apples and Oranges", "Any box works equally well"],
+    "correct_answer": "Apples and Oranges",
+    "explanation": "The 'Apples and Oranges' box is the most informative because its label being wrong means it cannot contain both — it must hold only apples or only oranges. A single fruit pulled from it therefore identifies it definitively. Once one box's identity is known, the constraint that every label is wrong forces a unique assignment for the remaining two: each of them is the one fruit type not used by the labeled name. Picking from either of the other two boxes is weaker — for instance, the 'Apples' box could contain only oranges OR the mixed set, so a single orange drawn from it leaves ambiguity."
   },
   {
-    "id": "exemplar-da-003",
+    "id": "exemplar-math-logic-003",
     "type": "multiple_choice",
-    "subject": "Data Analysis",
-    "tags": ["Sampling and Bias"],
-    "difficulty": "easy",
-    "question": "In statistics, what is the difference between a population and a sample?",
+    "subject": "Mathematics",
+    "tags": ["Logic Puzzles"],
+    "difficulty": "medium",
+    "question": "A chocolate bar forms a 6×8 grid of squares. You break it along the grid lines, one break at a time, where each break splits a single connected piece into two. What is the minimum number of breaks needed to separate the bar into all 48 individual squares?",
+    "options": ["12", "24", "47", "48"],
+    "correct_answer": "47",
+    "explanation": "Each break increases the total number of pieces by exactly one — you start with one connected piece and split it into two. Beginning with 1 piece and ending with 48 pieces means the piece-count must increase by 47, which requires 47 breaks. Remarkably, the answer doesn't depend on the bar's dimensions, the order of breaks, or any strategy: the invariant 'pieces increase by 1 per break' forces the result. This kind of invariant argument — finding a quantity that changes by a fixed amount per move — is one of the most powerful tools in olympiad combinatorics."
+  },
+  {
+    "id": "exemplar-math-logic-004",
+    "type": "multiple_choice",
+    "subject": "Mathematics",
+    "tags": ["Logic Puzzles"],
+    "difficulty": "medium",
+    "question": "Two diagonally opposite corner squares are removed from a standard 8×8 chessboard, leaving 62 squares. Can the remaining board be tiled by 31 dominoes, each covering exactly two orthogonally adjacent squares?",
     "options": [
-      "A population is the complete set of items being studied; a sample is a subset drawn from it",
-      "A population is the dataset before cleaning; a sample is the dataset after cleaning",
-      "A population refers to everyone targeted by a survey; a sample refers to those who actually responded",
-      "A population is the true statistical parameter; a sample is the estimate calculated from data"
+      "Yes, with a sufficiently clever arrangement",
+      "No, because the two removed squares share the same color, leaving 30 squares of one color and 32 of the other",
+      "Yes, because 62 is even and that is the only requirement",
+      "It depends on which pair of opposite corners is removed"
     ],
-    "correct_answer": "A population is the complete set of items being studied; a sample is a subset drawn from it",
-    "explanation": "In statistics, the population is the entire group of subjects, observations, or measurements of interest in a particular study — for example, all adults in a country, all transactions made on a website in 2023, or all manufactured parts in a factory's output. A sample is a subset of the population, typically selected because measuring the entire population is impractical or impossible. Statistical inference is the process of using properties calculated from the sample (the sample mean, sample variance, etc.) to estimate the corresponding properties of the population."
+    "correct_answer": "No, because the two removed squares share the same color, leaving 30 squares of one color and 32 of the other",
+    "explanation": "Color the board in the standard alternating pattern. Every domino covers exactly one black square and one white square, regardless of where it is placed, so any complete tiling requires equal numbers of black and white squares. A full chessboard has 32 of each. Diagonally opposite corners are always the same color (both black or both white, depending on which pair), so removing them leaves 30 of one color and 32 of the other. With unequal counts, no tiling is possible. This 'coloring invariant' technique is the standard approach for proving the impossibility of tilings and similar combinatorial constructions."
   }
 ]

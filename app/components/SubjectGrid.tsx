@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Atom,
   BookOpen,
@@ -144,21 +144,30 @@ function SubjectCard({
       </div>
 
       {/* Start button */}
-      <div className="px-4 pb-4 mt-auto">
-        {warn && (
-          <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-1.5 mb-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5"
-          >
-            <AlertCircle size={13} className="shrink-0" />
-            Choose a difficulty above to start.
-          </motion.p>
-        )}
+      <div className="px-4 pb-4 mt-auto relative">
+        <AnimatePresence>
+          {warn && (
+            <motion.div
+              initial={{ opacity: 0, y: 4, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 4, scale: 0.96 }}
+              transition={{ duration: 0.15 }}
+              className="absolute left-4 right-4 bottom-full mb-2 z-10 flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 shadow-md"
+            >
+              <AlertCircle size={13} className="shrink-0" />
+              Choose a difficulty above to start.
+              <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-1/2 rotate-45 w-2 h-2 bg-amber-50 border-r border-b border-amber-200" />
+            </motion.div>
+          )}
+        </AnimatePresence>
         <button
           disabled={!hasQuestions || loading}
           onClick={() => {
-            if (!selectedDiff) { setWarn(true); return; }
+            if (!selectedDiff) {
+              setWarn(true);
+              window.setTimeout(() => setWarn(false), 2500);
+              return;
+            }
             onStart(subject.id, selectedDiff);
           }}
           className="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#4f46e5] text-white hover:bg-[#4338ca] transition-colors text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
