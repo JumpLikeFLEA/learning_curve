@@ -89,15 +89,12 @@ function SubjectCard({
   index: number;
 }) {
   const Icon = ICON_MAP[subject.icon] ?? BookOpen;
-  const hasQuestions = subject.questionCount > 0;
   const [warn, setWarn] = React.useState(false);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: index * 0.03 }}
-      className="group flex flex-col rounded-2xl border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+    <div
+      style={{ animationDelay: `${index * 0.03}s` }}
+      className="group flex flex-col rounded-2xl border border-border bg-card hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 animate-in fade-in slide-in-from-bottom-4 fill-mode-both motion-reduce:animate-none"
     >
       {/* Subject header */}
       <div className="flex items-center gap-3 p-4 pb-3">
@@ -110,9 +107,7 @@ function SubjectCard({
         <div className="flex-1 min-w-0">
           <p className="font-medium text-foreground truncate">{subject.name}</p>
           <p className="text-xs text-muted-foreground">
-            {subject.questionCount === 0
-              ? "No questions yet"
-              : `${subject.questionCount} question${subject.questionCount !== 1 ? "s" : ""}`}
+            {`${subject.questionCount} question${subject.questionCount !== 1 ? "s" : ""}`}
           </p>
         </div>
       </div>
@@ -128,7 +123,7 @@ function SubjectCard({
             return (
               <button
                 key={diff}
-                disabled={!isAvailable || !hasQuestions}
+                disabled={!isAvailable}
                 onClick={() => { onSelectDiff(subject.id, diff); setWarn(false); }}
                 className={`flex-1 px-2 py-1.5 rounded-lg border text-xs transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                   isSelected
@@ -161,7 +156,7 @@ function SubjectCard({
           )}
         </AnimatePresence>
         <button
-          disabled={!hasQuestions || loading}
+          disabled={loading}
           onClick={() => {
             if (!selectedDiff) {
               setWarn(true);
@@ -176,7 +171,7 @@ function SubjectCard({
           {loading ? "Starting…" : "Start Quiz"}
         </button>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -273,7 +268,12 @@ export function SubjectGrid({ subjects }: { subjects: SubjectCardData[] }) {
       </div>
 
       {/* Grid */}
-      {filtered.length === 0 ? (
+      {subjects.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+          <BookOpen size={40} className="mb-3 opacity-30" />
+          <p>No quizzes available yet</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
           <BookOpen size={40} className="mb-3 opacity-30" />
           <p>No subjects match &ldquo;{query}&rdquo;</p>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Trophy, Star, Flame, Zap, BookOpen, Medal, Award, TrendingUp, Clock, Hash, Globe,
   Lock, CheckCircle2, Crown, RefreshCw, Calendar, CalendarCheck, Layers, Play
@@ -90,10 +89,8 @@ export function AchievementsView({
       </div>
 
       {/* Level & XP Banner */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-r from-[#4f46e5] to-[#7c3aed] text-white"
+      <div
+        className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-r from-[#4f46e5] to-[#7c3aed] text-white animate-in fade-in slide-in-from-bottom-4 fill-mode-both duration-300 motion-reduce:animate-none"
       >
         <div className="absolute inset-0 opacity-10">
           {[...Array(6)].map((_, i) => (
@@ -138,24 +135,22 @@ export function AchievementsView({
             <p className="text-3xl font-bold">{unlockedCount}<span className="text-lg text-white/60">/{ACHIEVEMENTS.length}</span></p>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* Stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {STATS.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <motion.div
+            <div
               key={stat.label}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-2xl border border-border bg-card text-center"
+              style={{ animationDelay: `${i * 0.05}s` }}
+              className="flex flex-col items-center gap-1.5 p-3 rounded-2xl border border-border bg-card text-center animate-in fade-in slide-in-from-bottom-[10px] fill-mode-both duration-300 motion-reduce:animate-none"
             >
               <Icon size={18} style={{ color: stat.color }} />
               <p className="font-semibold text-foreground">{stat.value}</p>
               <p className="text-xs text-muted-foreground leading-tight">{stat.label}</p>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -206,16 +201,14 @@ export function AchievementsView({
             : undefined;
 
           return (
-            <motion.div
+            <div
               key={a.id}
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.04 }}
+              style={{ animationDelay: `${i * 0.04}s` }}
               className={`relative flex flex-col gap-4 p-5 rounded-2xl border ${
                 isUnlocked
                   ? `${rarity.border} bg-card`
                   : "border-border bg-card opacity-70"
-              } transition-all hover:shadow-sm`}
+              } transition-all hover:shadow-sm animate-in fade-in zoom-in-95 fill-mode-both duration-300 motion-reduce:animate-none`}
             >
               {/* Rarity badge */}
               <div
@@ -270,7 +263,7 @@ export function AchievementsView({
                   </div>
                 </div>
               )}
-            </motion.div>
+            </div>
           );
         })}
       </div>
