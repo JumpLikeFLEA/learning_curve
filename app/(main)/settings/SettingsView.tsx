@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { UserIdentity } from "@supabase/supabase-js";
 import type { NotificationEventKey } from "@/lib/notificationPrefs";
 import type { ThemePreference } from "@/lib/theme";
@@ -86,6 +87,12 @@ export function SettingsView({
           </p>
         </div>
         <DataPrivacySection />
+        <p className="text-xs text-muted-foreground">
+          Read our{" "}
+          <Link href="/terms" className="text-brand-text hover:underline">Terms of Service</Link>{" "}
+          and{" "}
+          <Link href="/privacy" className="text-brand-text hover:underline">Privacy Policy</Link>.
+        </p>
       </section>
     </div>
   );

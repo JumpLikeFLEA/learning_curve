@@ -37,6 +37,18 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // Public routes are readable by everyone, signed IN or OUT. They must NOT go
+  // through authRoutes: that list also bounces signed-in users away (see the
+  // `user && isAuthRoute` guard below), which would make a signed-in user unable
+  // to open the Terms or Privacy pages. Return early after the session refresh
+  // above so the legal surface never touches the auth gates.
+  // `/robots.txt` is served by app/robots.ts. It must be here or the
+  // unauthenticated bounce below 307s it to /login and no crawler ever reads it.
+  const publicRoutes = ['/terms', '/privacy', '/subprocessors', '/robots.txt']
+  if (publicRoutes.includes(pathname)) {
+    return supabaseResponse
+  }
+
   const authRoutes = ['/login', '/signup', '/auth/callback', '/auth/confirm']
   const isAuthRoute = authRoutes.includes(pathname)
 

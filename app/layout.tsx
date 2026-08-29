@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 
@@ -21,8 +24,33 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Colloquiz",
-  description: "Test your knowledge with interactive quizzes",
+  // Absolute base for OG/canonical URLs. The icon, apple-icon and
+  // opengraph-image files (app/icon.tsx etc.) are picked up automatically and
+  // resolved against this.
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: SITE_NAME,
+    // Per-page titles render as "Progress · Colloquiz"; the bare default above
+    // is used where a page sets no title.
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  // Launch is public-but-unlisted; app/robots.ts carries the site-wide rule,
+  // and this reinforces it at the page level for crawlers that read the tag.
+  robots: { index: false, follow: false },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
@@ -48,6 +76,11 @@ export default function RootLayout({
           reintroduce the flash. */}
       <body className="h-full">
         <ThemeProvider>{children}</ThemeProvider>
+        {/* Cookieless by design — aggregate page views and Web Vitals only, no
+            identifying cookie. This is what lets the launch skip a cookie
+            banner (locked decision, DoR). */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

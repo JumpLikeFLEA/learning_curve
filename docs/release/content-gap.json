@@ -1,0 +1,567 @@
+{
+  "generated_at": "2026-08-28T21:05:41.967Z",
+  "target_per_difficulty": 30,
+  "quiz_size": 10,
+  "basis": "questions with status='approved' and visibility='shared' (get_subject_stats)",
+  "totals": {
+    "subjects_in_taxonomy": 20,
+    "subjects_with_questions": 16,
+    "questions_live": 2783,
+    "deficit_total": 346,
+    "deficit_hard": 176,
+    "subjects_broken": 3
+  },
+  "subjects": [
+    {
+      "id": "mathematics",
+      "name": "Mathematics",
+      "counts": {
+        "easy": 24,
+        "medium": 38,
+        "hard": 20
+      },
+      "total": 82,
+      "deficit": {
+        "easy": 6,
+        "medium": 0,
+        "hard": 10
+      },
+      "deficitTotal": 16,
+      "priority": "thin",
+      "brokenAt": [],
+      "subtopics": [
+        "Algebra",
+        "Geometry",
+        "Calculus",
+        "Statistics",
+        "Number Theory",
+        "Linear Algebra",
+        "Trigonometry",
+        "Discrete Math",
+        "Logic Puzzles",
+        "Limits",
+        "Continuity",
+        "Derivatives",
+        "Differentiation Rules",
+        "Chain Rule",
+        "Applications of Derivatives",
+        "Integrals",
+        "Fundamental Theorem of Calculus"
+      ]
+    },
+    {
+      "id": "physics",
+      "name": "Physics",
+      "counts": {
+        "easy": 24,
+        "medium": 24,
+        "hard": 16
+      },
+      "total": 64,
+      "deficit": {
+        "easy": 6,
+        "medium": 6,
+        "hard": 14
+      },
+      "deficitTotal": 26,
+      "priority": "thin",
+      "brokenAt": [],
+      "subtopics": [
+        "Mechanics",
+        "Thermodynamics",
+        "Electromagnetism",
+        "Optics",
+        "Quantum Physics",
+        "Relativity",
+        "Nuclear Physics",
+        "Waves"
+      ]
+    },
+    {
+      "id": "chemistry",
+      "name": "Chemistry",
+      "counts": {
+        "easy": 28,
+        "medium": 28,
+        "hard": 14
+      },
+      "total": 70,
+      "deficit": {
+        "easy": 2,
+        "medium": 2,
+        "hard": 16
+      },
+      "deficitTotal": 20,
+      "priority": "thin",
+      "brokenAt": [],
+      "subtopics": [
+        "Organic Chemistry",
+        "Inorganic Chemistry",
+        "Physical Chemistry",
+        "Biochemistry",
+        "Electrochemistry",
+        "Thermochemistry",
+        "Analytical Chemistry"
+      ]
+    },
+    {
+      "id": "biology",
+      "name": "Biology",
+      "counts": {
+        "easy": 86,
+        "medium": 116,
+        "hard": 47
+      },
+      "total": 249,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Cell Biology",
+        "Genetics",
+        "Ecology",
+        "Evolution",
+        "Anatomy",
+        "Microbiology",
+        "Botany",
+        "Zoology",
+        "Biochemistry",
+        "Behavioral Biology"
+      ]
+    },
+    {
+      "id": "history",
+      "name": "History",
+      "counts": {
+        "easy": 216,
+        "medium": 176,
+        "hard": 158
+      },
+      "total": 550,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Ancient History",
+        "Medieval History",
+        "Modern History",
+        "World Wars",
+        "American History",
+        "European History",
+        "Asian History",
+        "African History",
+        "Cold War"
+      ]
+    },
+    {
+      "id": "geography",
+      "name": "Geography",
+      "counts": {
+        "easy": 98,
+        "medium": 98,
+        "hard": 49
+      },
+      "total": 245,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Physical Geography",
+        "Human Geography",
+        "Climatology",
+        "Cartography",
+        "Geopolitics",
+        "Environmental Geography",
+        "Urban Geography",
+        "Countries and Capitals"
+      ]
+    },
+    {
+      "id": "literature",
+      "name": "Literature",
+      "counts": {
+        "easy": 32,
+        "medium": 32,
+        "hard": 16
+      },
+      "total": 80,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 14
+      },
+      "deficitTotal": 14,
+      "priority": "thin",
+      "brokenAt": [],
+      "subtopics": [
+        "Poetry",
+        "Fiction",
+        "Drama",
+        "Non-Fiction",
+        "World Literature",
+        "Literary Theory",
+        "American Literature",
+        "British Literature"
+      ]
+    },
+    {
+      "id": "computer_science",
+      "name": "Computer Science",
+      "counts": {
+        "easy": 89,
+        "medium": 80,
+        "hard": 28
+      },
+      "total": 197,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 2
+      },
+      "deficitTotal": 2,
+      "priority": "thin",
+      "brokenAt": [],
+      "subtopics": [
+        "Algorithms",
+        "Data Structures",
+        "Networks",
+        "Databases",
+        "Operating Systems",
+        "Machine Learning",
+        "Web Development",
+        "Cybersecurity",
+        "Software Engineering",
+        "Programming Languages",
+        "Docker",
+        "PyTorch"
+      ]
+    },
+    {
+      "id": "economics",
+      "name": "Economics",
+      "counts": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "total": 0,
+      "deficit": {
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
+      },
+      "deficitTotal": 90,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Microeconomics",
+        "Macroeconomics",
+        "International Trade",
+        "Behavioral Economics",
+        "Development Economics",
+        "Financial Markets"
+      ]
+    },
+    {
+      "id": "psychology",
+      "name": "Psychology",
+      "counts": {
+        "easy": 177,
+        "medium": 202,
+        "hard": 93
+      },
+      "total": 472,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Cognitive Psychology",
+        "Social Psychology",
+        "Developmental Psychology",
+        "Clinical Psychology",
+        "Neuroscience",
+        "Behavioral Psychology"
+      ]
+    },
+    {
+      "id": "art",
+      "name": "Art & Design",
+      "counts": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "total": 0,
+      "deficit": {
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
+      },
+      "deficitTotal": 90,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Art History",
+        "Visual Design",
+        "Color Theory",
+        "Photography",
+        "Sculpture",
+        "Painting Techniques"
+      ]
+    },
+    {
+      "id": "music",
+      "name": "Music",
+      "counts": {
+        "easy": 24,
+        "medium": 24,
+        "hard": 12
+      },
+      "total": 60,
+      "deficit": {
+        "easy": 6,
+        "medium": 6,
+        "hard": 18
+      },
+      "deficitTotal": 30,
+      "priority": "thin",
+      "brokenAt": [],
+      "subtopics": [
+        "Music Theory",
+        "Music History",
+        "Harmony",
+        "Rhythm",
+        "Composition",
+        "World Music"
+      ]
+    },
+    {
+      "id": "languages",
+      "name": "Languages",
+      "counts": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "total": 0,
+      "deficit": {
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
+      },
+      "deficitTotal": 90,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Grammar",
+        "Vocabulary",
+        "Etymology",
+        "Linguistics",
+        "Phonology",
+        "Semantics",
+        "Pragmatics"
+      ]
+    },
+    {
+      "id": "philosophy",
+      "name": "Philosophy",
+      "counts": {
+        "easy": 176,
+        "medium": 203,
+        "hard": 93
+      },
+      "total": 472,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Ethics",
+        "Metaphysics",
+        "Logic",
+        "Epistemology",
+        "Political Philosophy",
+        "Philosophy of Mind"
+      ]
+    },
+    {
+      "id": "data_analysis",
+      "name": "Data Analysis",
+      "counts": {
+        "easy": 27,
+        "medium": 0,
+        "hard": 0
+      },
+      "total": 27,
+      "deficit": {
+        "easy": 3,
+        "medium": 30,
+        "hard": 30
+      },
+      "deficitTotal": 63,
+      "priority": "broken",
+      "brokenAt": [
+        "medium",
+        "hard"
+      ],
+      "subtopics": [
+        "Descriptive Statistics",
+        "Probability Distributions",
+        "Hypothesis Testing",
+        "Correlation and Regression",
+        "Sampling and Bias",
+        "Pandas"
+      ]
+    },
+    {
+      "id": "motion_design_and_video",
+      "name": "Motion Design & Video",
+      "counts": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "total": 0,
+      "deficit": {
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
+      },
+      "deficitTotal": 90,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "2D Animation",
+        "After Effects",
+        "Kinetic Typography",
+        "VFX & Compositing",
+        "Video Editing"
+      ]
+    },
+    {
+      "id": "sports_history",
+      "name": "Sports History",
+      "counts": {
+        "easy": 45,
+        "medium": 45,
+        "hard": 30
+      },
+      "total": 120,
+      "deficit": {
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
+      },
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
+      "subtopics": [
+        "Chess",
+        "Tennis",
+        "Football"
+      ]
+    },
+    {
+      "id": "esports_history",
+      "name": "Esports History",
+      "counts": {
+        "easy": 20,
+        "medium": 10,
+        "hard": 0
+      },
+      "total": 30,
+      "deficit": {
+        "easy": 10,
+        "medium": 20,
+        "hard": 30
+      },
+      "deficitTotal": 60,
+      "priority": "broken",
+      "brokenAt": [
+        "hard"
+      ],
+      "subtopics": [
+        "Counter Strike"
+      ]
+    },
+    {
+      "id": "science_history",
+      "name": "Science History",
+      "counts": {
+        "easy": 15,
+        "medium": 15,
+        "hard": 15
+      },
+      "total": 45,
+      "deficit": {
+        "easy": 15,
+        "medium": 15,
+        "hard": 15
+      },
+      "deficitTotal": 45,
+      "priority": "thin",
+      "brokenAt": [],
+      "subtopics": [
+        "Ancient World",
+        "Medieval and Islamic Golden Age",
+        "Scientific Revolution",
+        "Enlightenment",
+        "19th Century",
+        "Modern Era"
+      ]
+    },
+    {
+      "id": "trivium",
+      "name": "Trivium",
+      "counts": {
+        "easy": 5,
+        "medium": 12,
+        "hard": 3
+      },
+      "total": 20,
+      "deficit": {
+        "easy": 25,
+        "medium": 18,
+        "hard": 27
+      },
+      "deficitTotal": 70,
+      "priority": "broken",
+      "brokenAt": [
+        "easy",
+        "hard"
+      ],
+      "subtopics": [
+        "History and Society",
+        "Natural World",
+        "Earth and Space",
+        "Numbers and Logic",
+        "Culture and Arts",
+        "Human Mind"
+      ]
+    }
+  ]
+}

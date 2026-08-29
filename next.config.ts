@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // Avatars are served from the project's Supabase Storage host, which differs
 // per environment — derive it from the same env var the Supabase clients use
 // rather than hardcoding a project ref.
-const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : undefined;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseHost = supabaseUrl ? new URL(supabaseUrl).hostname : undefined;
 
 // The build identifier stamped onto feedback submissions (see lib/appVersion.ts).
 // Resolved here, at build time, because `VERCEL_GIT_COMMIT_SHA` is a server-side
@@ -16,7 +16,53 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
 const appVersion =
   process.env.NEXT_PUBLIC_APP_VERSION || process.env.VERCEL_GIT_COMMIT_SHA || "dev";
 
+const isDev = process.env.NODE_ENV === "development";
+
+// ── Content Security Policy ──────────────────────────────────────────────
+// Shipped REPORT-ONLY first (locked decision): it observes and logs violations
+// without blocking anything, so the real policy can be tightened against real
+// traffic before it is enforced. No nonces — a nonce-based CSP forces every page
+// to render dynamically (Next injects nonces per request), which would throw
+// away the static/streamed rendering the app is built around; the cost is
+// keeping 'unsafe-inline' for the framework's and next-themes' inline scripts.
+//
+// Origins allowed beyond 'self':
+//   • Supabase — REST + Realtime websocket (connect), avatar images (img)
+//   • Sentry — error/CSP ingest (connect)
+//   • Vercel — analytics script (script) + Web Vitals beacon (connect)
+const supabaseHttps = supabaseUrl ? new URL(supabaseUrl).origin : "";
+const supabaseWss = supabaseHost ? `wss://${supabaseHost}` : "";
+
+const csp = [
+  `default-src 'self'`,
+  // 'unsafe-eval' only in dev (React uses eval for better stack traces).
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} https://va.vercel-scripts.com`,
+  `style-src 'self' 'unsafe-inline'`,
+  `img-src 'self' blob: data: ${supabaseHttps}`.trim(),
+  `font-src 'self' data:`,
+  `connect-src 'self' ${supabaseHttps} ${supabaseWss} https://*.sentry.io https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://vitals.vercel-insights.com https://va.vercel-scripts.com`.replace(/\s+/g, " ").trim(),
+  `frame-ancestors 'none'`,
+  `base-uri 'self'`,
+  `form-action 'self'`,
+  `object-src 'none'`,
+  `upgrade-insecure-requests`,
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy-Report-Only", value: csp },
+  // Defence in depth alongside the CSP frame-ancestors 'none' above.
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+  },
+];
+
 const nextConfig: NextConfig = {
+  // Drop the `X-Powered-By: Next.js` banner — no reason to advertise the stack.
+  poweredByHeader: false,
   env: {
     NEXT_PUBLIC_APP_VERSION: appVersion,
   },
@@ -31,6 +77,18 @@ const nextConfig: NextConfig = {
         ]
       : [],
   },
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
 };
 
-export default nextConfig;
+// withSentryConfig injects the client/server config and (when SENTRY_AUTH_TOKEN
+// + org/project are present, i.e. in CI/prod) uploads source maps. Without those
+// env vars it warns and skips upload — the build still succeeds, so local and CI
+// builds are unaffected.
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+});

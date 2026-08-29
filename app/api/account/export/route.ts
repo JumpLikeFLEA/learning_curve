@@ -28,6 +28,42 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Rate limit BEFORE the reads. Logging the request is what the trigger
+    // counts (migration 038); a PT429 from that trigger is the cap tripping.
+    // No .select() chained — account_export_log has no owner SELECT policy, so
+    // asking for the row back would fail (same as the feedback insert).
+    const { error: logError } = await supabase
+      .from("account_export_log")
+      .insert({ user_id: user.id });
+    if (logError) {
+      if (logError.code === "PT429") {
+        const { data: quota } = await supabase.rpc("account_export_quota");
+        const resetsAt =
+          quota && typeof quota === "object" && "resets_at" in quota
+            ? (quota.resets_at as string | null)
+            : null;
+        const retryAfterSeconds = resetsAt
+          ? Math.max(1, Math.ceil((new Date(resetsAt).getTime() - Date.now()) / 1000))
+          : null;
+        return NextResponse.json(
+          {
+            error:
+              "You've exported your data several times in the last hour. " +
+              "Please try again a little later.",
+            retryAfterSeconds,
+          },
+          {
+            status: 429,
+            ...(retryAfterSeconds
+              ? { headers: { "Retry-After": String(retryAfterSeconds) } }
+              : {}),
+          },
+        );
+      }
+      console.error("account export log insert failed", logError);
+      return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    }
+
     const [profileRes, resultsRes, achievementsRes, membershipsRes, duelsRes] =
       await Promise.all([
         supabase

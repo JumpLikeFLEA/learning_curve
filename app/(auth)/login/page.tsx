@@ -10,6 +10,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 const NOTICE_MESSAGES: Record<string, string> = {
   confirmed_sign_in: "Your email has been confirmed. Please sign in with your password.",
+  account_deleted: "Your account has been closed and your personal details erased. Thanks for using Colloquiz.",
 };
 
 export default async function LoginPage({

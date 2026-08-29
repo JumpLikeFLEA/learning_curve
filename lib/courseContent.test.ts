@@ -15,6 +15,10 @@ describe("TheoryBlockSchema — valid blocks", () => {
     ],
     ["callout note", { type: "callout", tone: "note", body: "Continuity is stronger than a limit." }],
     ["callout warning", { type: "callout", tone: "warning", body: "Do not cancel across an addition." }],
+    // Prose / example / callout bodies allow embedded newlines (commit e82c3aa,
+    // `authoredString(1, { allowNewlines: true })`); a paragraph can span lines.
+    ["prose with newline", { type: "prose", body: "Line one.\nLine two." }],
+    ["callout with newline", { type: "callout", tone: "note", body: "First point.\nSecond point." }],
     ["list ordered", { type: "list", ordered: true, items: ["First", "Second"] }],
     ["list unordered", { type: "list", ordered: false, items: ["A limit", "A one-sided limit"] }],
     ["definition", { type: "definition", term: "Continuous", body: "\\(f\\) is continuous at \\(a\\)…" }],
@@ -38,8 +42,11 @@ describe("TheoryBlockSchema — rejections", () => {
     ["extra key (strict)", { type: "prose", body: "x", author: "me" }],
     ["misspelled field", { type: "prose", boddy: "x" }],
     ["empty prose body", { type: "prose", body: "" }],
-    ["embedded newline", { type: "prose", body: "line one\nline two" }],
-    ["embedded tab", { type: "prose", body: "a\tb" }],
+    // Newlines are permitted ONLY in prose/example/callout bodies. Single-line
+    // fields (formula body, list items, definition term/body) still reject them.
+    ["embedded newline in formula", { type: "formula", body: "\\[a\\]\nb" }],
+    ["embedded newline in list item", { type: "list", ordered: false, items: ["a\nb"] }],
+    ["embedded tab in prose", { type: "prose", body: "a\tb" }],
     ["invalid callout tone", { type: "callout", tone: "danger", body: "x" }],
     ["empty steps array", { type: "example", statement: "s", steps: [] }],
     ["empty items array", { type: "list", ordered: true, items: [] }],

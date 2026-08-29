@@ -8,6 +8,7 @@ import {
   FlaskConical, Brain, ArrowRight
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { GoogleIcon, DiscordIcon } from "@/app/components/ProviderIcons";
 
@@ -192,11 +193,14 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
+  // Clickwrap consent for the email/password sign-up path (16+ + Terms/Privacy).
+  const [agreed, setAgreed] = useState(false);
 
   const handleToggle = () => {
     const next = mode === "login" ? "register" : "login";
     setMode(next);
     setForm({ email: "", password: "", name: "", confirmPassword: "", city: "" });
+    setAgreed(false);
     setError(null);
     window.history.replaceState(null, "", next === "login" ? "/login" : "/signup");
   };
@@ -207,6 +211,11 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
 
     if (mode === "register" && form.password !== form.confirmPassword) {
       setError("Passwords do not match");
+      return;
+    }
+
+    if (mode === "register" && !agreed) {
+      setError("Please confirm you are 16 or over and accept the Terms and Privacy Policy.");
       return;
     }
 
@@ -397,6 +406,15 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
                 </button>
               </div>
 
+              {mode === "register" && (
+                <p className="text-xs text-muted-foreground text-center">
+                  Signing up with Google or Discord also confirms you are 16 or over and accept our{" "}
+                  <Link href="/terms" target="_blank" rel="noreferrer" className="text-brand-text hover:underline">Terms</Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" target="_blank" rel="noreferrer" className="text-brand-text hover:underline">Privacy Policy</Link>.
+                </p>
+              )}
+
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-border" />
                 <span className="text-xs text-muted-foreground">or</span>
@@ -473,6 +491,32 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
               )}
             </AnimatePresence>
           </div>
+
+          <AnimatePresence initial={false}>
+            {mode === "register" && (
+              <motion.label
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden flex items-start gap-2.5 text-sm text-muted-foreground cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={e => setAgreed(e.target.checked)}
+                  required
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-brand cursor-pointer"
+                />
+                <span>
+                  I am 16 or over and agree to the{" "}
+                  <Link href="/terms" target="_blank" rel="noreferrer" className="text-brand-text font-medium hover:underline">Terms of Service</Link>{" "}
+                  and{" "}
+                  <Link href="/privacy" target="_blank" rel="noreferrer" className="text-brand-text font-medium hover:underline">Privacy Policy</Link>.
+                </span>
+              </motion.label>
+            )}
+          </AnimatePresence>
 
           {mode === "login" && (
             <button

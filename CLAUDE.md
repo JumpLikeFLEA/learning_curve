@@ -323,3 +323,79 @@
   chains through questions/quizzes.group_id into results, so cascading an owner
   would destroy other members' quiz history. Do not add a delete control before
   that is resolved
+- Legal surface (2026-08-29, app/(legal)/** + lib/legalDoc.tsx + proxy.ts
+  publicRoutes + migration 036 + docs/release/legal/*.md): the public /terms,
+  /privacy and /subprocessors pages for the 1.0 release. No Figma source; the
+  (legal) layout is composed from classes already in use (the AuthScreen logo
+  chip, border/muted tokens, a max-w-3xl reading column) — same precedent as
+  NotificationBell and Groups. The three markdown files under
+  docs/release/legal/ are the SINGLE SOURCE OF TRUTH (reviewed legal copy); the
+  pages readFileSync them at build time (force-static, so no runtime fs on
+  Vercel) and render them through lib/legalDoc.tsx, a deliberately small
+  Markdown-SUBSET renderer — NOT a general engine and must not become one. It
+  handles only the constructs those files use, which is why there is no markdown
+  npm dependency; blockquotes are dropped on purpose because the only
+  blockquotes in the source are maintainer notes ("Source of truth", "Not legal
+  advice") that must not reach users. proxy.ts gained a publicRoutes list read
+  signed IN and OUT — kept SEPARATE from authRoutes, which also bounces
+  signed-in users away. Do not fold the legal routes into authRoutes
+- AuthScreen (app/(auth)/AuthScreen.tsx): sign-up clickwrap RESTORED
+  (2026-08-29), deliberately REVERSING the 2026-07-06 entry that removed the
+  Terms/Privacy line. Register mode now shows a required consent checkbox ("I am
+  16 or over and agree to the Terms of Service and Privacy Policy", links to
+  /terms + /privacy) gated in handleSubmit, plus a short consent-by-action note
+  under the Google/Discord buttons for the OAuth path (which bypasses the form).
+  Consent is RECORDED server-side by migration 036: handle_new_user() stamps
+  profiles.terms_accepted_at + terms_version on every new profile. Composed from
+  classes already in AuthScreen; the checkbox uses accent-brand. Do not remove
+- Settings > Data and privacy — DELETE half added (2026-08-29, migration 037 +
+  lib/accountDelete.ts + lib/supabase/admin.ts + app/api/account/delete/route.ts +
+  settings/DataPrivacySection.tsx). Right to erasure by ANONYMISATION, not row
+  deletion (see docs/adr/0002-account-erasure.md — six FKs to profiles block a
+  hard delete; groups.owner_id CASCADE would destroy other members' history).
+  delete_my_account() (SECURITY DEFINER, returns JSONB) BLOCKS with the group
+  list if the caller owns a group that still has other members (do NOT
+  auto-transfer — locked in ADR 0002), else anonymises the profile
+  (display_name → 'Deleted user', nulls name/city/avatar, sets deleted_at +
+  leaderboard_opt_out), deletes solo-owned groups + transient data, and leaves
+  results/authored content in place unattributable. The route then removes avatar
+  objects and BANS the auth user with the SERVICE ROLE (ban, not delete — the FKs
+  forbid delete); ban is the erasure mechanism. 037 also adds `deleted_at IS NULL`
+  to the three leaderboard RPCs (belt-and-braces over the opt-out the RPC sets).
+  NO column GRANT for deleted_at (same reasoning as 036: written only by the
+  SECURITY DEFINER RPC). The route takes NO caller input — JWT is the only
+  selector, mirroring the export route. UI is a danger-zone block below the export
+  with a type-"DELETE" confirm dialog, export offered first; composed from the
+  existing Dialog/Input + destructive-* tokens. lib/supabase/admin.ts is the
+  first service-role client — server-only, bypasses RLS, never reaches the
+  browser. Do not add a hard-delete path before the six FKs are redesigned (1.2)
+- Ops & resilience surface (2026-08-29, Session E). No Figma source for any of it;
+  the visible pieces compose from existing card/border/destructive tokens and the
+  ErrorDialog copy voice (the NotificationBell precedent).
+  • Error boundaries: app/global-error.tsx (INLINE-styled — it replaces the root
+    layout, so globals.css/ThemeProvider/Geist are NOT available; a boundary that
+    depends on what just failed is no boundary), app/not-found.tsx (root 404 in the
+    root layout), app/(main)/error.tsx and app/(auth)/error.tsx (client boundaries;
+    (main) renders INSIDE the shell so the sidebar survives one page's throw).
+  • Sentry: lib/sentryScrub.ts is a pure, SDK-type-free PII scrubber (drops the whole
+    cookie jar incl. the sb-* session, Cookie/Authorization/sb-* headers, email, IP)
+    wired into every beforeSend; sendDefaultPii is off. Init split per runtime
+    (sentry.server/edge.config.ts + instrumentation-client.ts) and loaded by
+    instrumentation.ts register(). INERT without NEXT_PUBLIC_SENTRY_DSN and
+    production-only, so dev/CI/build send nothing. Create the project in the EU region.
+  • CSP is REPORT-ONLY and NONCE-FREE on purpose (next.config.ts headers()): a
+    nonce-based CSP forces every page to render dynamically, discarding the app's
+    static/streamed rendering — the cost is keeping 'unsafe-inline' for the framework
+    and next-themes inline scripts. Do not switch to nonces without accepting that
+    trade. Allows Supabase REST+wss, Sentry ingest, the Vercel analytics script/beacon.
+  • Vercel Analytics + Speed Insights (<Analytics/> + <SpeedInsights/> in layout) are
+    cookieless — this is load-bearing for the no-cookie-banner decision; do not swap in
+    a cookie-setting analytics tool.
+  • Metadata/OG: app/icon.tsx, apple-icon.tsx, opengraph-image.tsx generate the brand
+    images via next/og from lib/site.ts (SITE_URL falls back to https://colloquiz.app);
+    the brand hexes are duplicated in lib/site.ts because Satori has no CSS-var access.
+    metadata.robots is index:false to match the noindex launch; app/robots.ts is the
+    site-wide rule and /robots.txt is in proxy.ts publicRoutes (or it 307s to /login).
+  • Export rate limit: migration 038 mirrors feedback_rate_limit (026) — a log table
+    counted by a BEFORE INSERT trigger raising PT429; the route logs-and-counts BEFORE
+    the reads. Same "cap lives in the DB, holds even for a direct PostgREST caller" rule
