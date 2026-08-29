@@ -130,7 +130,19 @@
       "Hypothesis Testing",
       "Correlation and Regression",
       "Sampling and Bias",
-      "Pandas"
+      "Pandas",
+      "SQL",
+      "Data Visualization",
+      "Data Wrangling",
+      "Correlation",
+      "Sampling",
+      "Probability",
+      "Distributions",
+      "Confidence Intervals",
+      "Regression",
+      "A/B Testing",
+      "Experimental Design",
+      "Time Series"
     ]
   },
   {
@@ -155,7 +167,7 @@
     "icon": "Gamepad2",
     "color": "#6d28d9",
     "tags": ["counter strike"],
-    "subtopics": ["Counter Strike"]
+    "subtopics": ["Counter Strike", "Dota 2", "StarCraft", "League of Legends"]
   },
   {
     "id": "science_history",
@@ -171,6 +183,6 @@
     "icon": "Lightbulb",
     "color": "#ca8a04",
     "tags": ["history and society", "natural world", "earth and space", "numbers and logic", "culture and arts", "human mind"],
-    "subtopics": ["History and Society", "Natural World", "Earth and Space", "Numbers and Logic", "Culture and Arts", "Human Mind"]
+    "subtopics": ["History and Society", "Natural World", "Earth and Space", "Numbers and Logic", "Culture and Arts", "Human Mind", "Mythology", "Food and Drink", "Art and Architecture", "Language and Etymology", "Literature", "Inventions"]
   }
 ]

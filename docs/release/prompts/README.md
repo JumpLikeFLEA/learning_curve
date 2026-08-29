@@ -1,14 +1,13 @@
 # Content prompt pack — 1.0
 
-_Generated 2026-08-28T21:05:41.967Z by `scripts/build-content-prompts.ts`._
+_Generated 2026-08-29T14:11:20.450Z by `scripts/build-content-prompts.ts`._
 
-Target: **30 per difficulty**. Live bank: **2783** questions across **16** subjects. Deficit: **346** (**176** of them hard).
+Target: **30 per difficulty**. Live bank: **2879** questions across **16** subjects. Deficit: **261** (**140** of them hard).
 
 | Subject | easy | med | hard | to author | status |
 | --- | ---: | ---: | ---: | ---: | --- |
-| [Trivium](trivium.md) | 5 | 12 | 3 | **70** | ⚠ unplayable at easy, hard |
-| [Data Analysis](data_analysis.md) | 27 | 0 | 0 | **63** | ⚠ unplayable at medium, hard |
-| [Esports History](esports_history.md) | 20 | 10 | 0 | **60** | ⚠ unplayable at hard |
+| [Trivium](trivium.md) | 9 | 16 | 6 | **59** | ⚠ unplayable at easy, hard |
+| [Esports History](esports_history.md) | 24 | 14 | 3 | **49** | ⚠ unplayable at hard |
 | [Science History](science_history.md) | 15 | 15 | 15 | **45** | thin |
 | [Music](music.md) | 24 | 24 | 12 | **30** | thin |
 | [Physics](physics.md) | 24 | 24 | 16 | **26** | thin |

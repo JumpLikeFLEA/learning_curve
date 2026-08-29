@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-08-28T21:05:41.967Z",
+  "generated_at": "2026-08-29T14:11:20.450Z",
   "target_per_difficulty": 30,
   "quiz_size": 10,
   "basis": "questions with status='approved' and visibility='shared' (get_subject_stats)",
   "totals": {
     "subjects_in_taxonomy": 20,
     "subjects_with_questions": 16,
-    "questions_live": 2783,
-    "deficit_total": 346,
-    "deficit_hard": 176,
-    "subjects_broken": 3
+    "questions_live": 2879,
+    "deficit_total": 261,
+    "deficit_hard": 140,
+    "subjects_broken": 2
   },
   "subjects": [
     {
@@ -412,29 +412,38 @@
       "id": "data_analysis",
       "name": "Data Analysis",
       "counts": {
-        "easy": 27,
+        "easy": 34,
+        "medium": 34,
+        "hard": 33
+      },
+      "total": 101,
+      "deficit": {
+        "easy": 0,
         "medium": 0,
         "hard": 0
       },
-      "total": 27,
-      "deficit": {
-        "easy": 3,
-        "medium": 30,
-        "hard": 30
-      },
-      "deficitTotal": 63,
-      "priority": "broken",
-      "brokenAt": [
-        "medium",
-        "hard"
-      ],
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
       "subtopics": [
         "Descriptive Statistics",
         "Probability Distributions",
         "Hypothesis Testing",
         "Correlation and Regression",
         "Sampling and Bias",
-        "Pandas"
+        "Pandas",
+        "SQL",
+        "Data Visualization",
+        "Data Wrangling",
+        "Correlation",
+        "Sampling",
+        "Probability",
+        "Distributions",
+        "Confidence Intervals",
+        "Regression",
+        "A/B Testing",
+        "Experimental Design",
+        "Time Series"
       ]
     },
     {
@@ -489,23 +498,26 @@
       "id": "esports_history",
       "name": "Esports History",
       "counts": {
-        "easy": 20,
-        "medium": 10,
-        "hard": 0
+        "easy": 24,
+        "medium": 14,
+        "hard": 3
       },
-      "total": 30,
+      "total": 41,
       "deficit": {
-        "easy": 10,
-        "medium": 20,
-        "hard": 30
+        "easy": 6,
+        "medium": 16,
+        "hard": 27
       },
-      "deficitTotal": 60,
+      "deficitTotal": 49,
       "priority": "broken",
       "brokenAt": [
         "hard"
       ],
       "subtopics": [
-        "Counter Strike"
+        "Counter Strike",
+        "Dota 2",
+        "StarCraft",
+        "League of Legends"
       ]
     },
     {
@@ -538,17 +550,17 @@
       "id": "trivium",
       "name": "Trivium",
       "counts": {
-        "easy": 5,
-        "medium": 12,
-        "hard": 3
+        "easy": 9,
+        "medium": 16,
+        "hard": 6
       },
-      "total": 20,
+      "total": 31,
       "deficit": {
-        "easy": 25,
-        "medium": 18,
-        "hard": 27
+        "easy": 21,
+        "medium": 14,
+        "hard": 24
       },
-      "deficitTotal": 70,
+      "deficitTotal": 59,
       "priority": "broken",
       "brokenAt": [
         "easy",
@@ -560,7 +572,13 @@
         "Earth and Space",
         "Numbers and Logic",
         "Culture and Arts",
-        "Human Mind"
+        "Human Mind",
+        "Mythology",
+        "Food and Drink",
+        "Art and Architecture",
+        "Language and Etymology",
+        "Literature",
+        "Inventions"
       ]
     }
   ]
