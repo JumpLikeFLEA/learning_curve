@@ -2,7 +2,7 @@
 
 **Colloquiz — https://colloquiz.app**
 
-Version 1.0 · Last updated 2026-08-29
+Version 1.0 · Last updated 2026-09-01
 
 > **Source of truth.** This file is the canonical text. `app/(legal)/terms/page.tsx`
 > renders it; edit here first. Fill every `[BRACKETED]` placeholder before publication.
@@ -25,9 +25,12 @@ forms part of this agreement.
 
 ## 2. Eligibility
 
-You must be **at least 16 years old** to use the Service. You confirm your age when you
-create an account. If we learn that an account belongs to someone under 16, we will close
+You must be **at least 13 years old** to use the Service. You confirm your age when you
+create an account. If we learn that an account belongs to someone under 13, we will close
 it.
+
+If you are **under 18**, you confirm that a parent or guardian is aware of and permits your
+use of the Service.
 
 You must have the legal capacity to enter into this agreement, and you must not be barred
 from using the Service under any applicable law.

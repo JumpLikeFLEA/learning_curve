@@ -5,7 +5,7 @@
     "icon": "Calculator",
     "color": "#6366f1",
     "tags": [],
-    "subtopics": ["Algebra", "Geometry", "Calculus", "Statistics", "Number Theory", "Linear Algebra", "Trigonometry", "Discrete Math", "Logic Puzzles", "Limits", "Continuity", "Derivatives", "Differentiation Rules", "Chain Rule", "Applications of Derivatives", "Integrals", "Fundamental Theorem of Calculus"]
+    "subtopics": ["Algebra", "Geometry", "Calculus", "Statistics", "Number Theory", "Linear Algebra", "Trigonometry", "Discrete Math", "Logic Puzzles", "Limits", "Continuity", "Derivatives", "Differentiation Rules", "Chain Rule", "Applications of Derivatives", "Integrals", "Fundamental Theorem of Calculus", "Arithmetic", "Set Theory", "Analysis", "Abstract Algebra", "Probability", "Mathematical Logic", "Topology", "Complex Analysis"]
   },
   {
     "id": "physics",
@@ -13,7 +13,7 @@
     "icon": "Atom",
     "color": "#8b5cf6",
     "tags": [],
-    "subtopics": ["Mechanics", "Thermodynamics", "Electromagnetism", "Optics", "Quantum Physics", "Relativity", "Nuclear Physics", "Waves"]
+    "subtopics": ["Mechanics", "Thermodynamics", "Electromagnetism", "Optics", "Quantum Physics", "Relativity", "Nuclear Physics", "Waves", "Fluid Mechanics", "Quantum Mechanics"]
   },
   {
     "id": "chemistry",
@@ -21,7 +21,7 @@
     "icon": "FlaskConical",
     "color": "#ec4899",
     "tags": [],
-    "subtopics": ["Organic Chemistry", "Inorganic Chemistry", "Physical Chemistry", "Biochemistry", "Electrochemistry", "Thermochemistry", "Analytical Chemistry"]
+    "subtopics": ["Organic Chemistry", "Inorganic Chemistry", "Physical Chemistry", "Biochemistry", "Electrochemistry", "Thermochemistry", "Analytical Chemistry", "Periodic Table", "Acids and Bases", "Stoichiometry", "Organic Reaction Mechanisms", "Aromaticity", "Chemical Equilibrium", "Thermodynamics", "Solubility", "Molecular Structure", "Coordination Chemistry", "Stereochemistry", "Solutions", "Redox Chemistry", "Chemical Kinetics"]
   },
   {
     "id": "biology",
@@ -53,7 +53,7 @@
     "icon": "BookOpen",
     "color": "#ef4444",
     "tags": [],
-    "subtopics": ["Poetry", "Fiction", "Drama", "Non-Fiction", "World Literature", "Literary Theory", "American Literature", "British Literature"]
+    "subtopics": ["Poetry", "Fiction", "Drama", "Non-Fiction", "World Literature", "Literary Theory", "American Literature", "British Literature", "Poetic Form", "Narrative Technique", "Literary Criticism", "Modernism", "Classical Literature", "Genre", "Romanticism", "Medieval Literature"]
   },
   {
     "id": "computer_science",
@@ -61,7 +61,7 @@
     "icon": "Code",
     "color": "#06b6d4",
     "tags": ["algorithms", "data structures", "computational complexity", "theory of computation", "discrete mathematics", "programming languages", "operating systems", "databases", "computer networks", "artificial intelligence"],
-    "subtopics": ["Algorithms", "Data Structures", "Networks", "Databases", "Operating Systems", "Machine Learning", "Web Development", "Cybersecurity", "Software Engineering", "Programming Languages", "Docker", "PyTorch"]
+    "subtopics": ["Algorithms", "Data Structures", "Networks", "Databases", "Operating Systems", "Machine Learning", "Web Development", "Cybersecurity", "Software Engineering", "Programming Languages", "Docker", "PyTorch", "Theory of Computation"]
   },
   {
     "id": "economics",
@@ -93,7 +93,7 @@
     "icon": "Music",
     "color": "#14b8a6",
     "tags": [],
-    "subtopics": ["Music Theory", "Music History", "Harmony", "Rhythm", "Composition", "World Music"]
+    "subtopics": ["Music Theory", "Music History", "Harmony", "Rhythm", "Composition", "World Music", "Notation", "Performance Practice", "Instruments", "Rhythm and Meter", "Jazz", "Modes", "Musical Form", "Counterpoint", "Tuning and Acoustics", "Twentieth Century Music"]
   },
   {
     "id": "languages",
@@ -175,7 +175,7 @@
     "icon": "Microscope",
     "color": "#65a30d",
     "tags": ["ancient world", "medieval and islamic golden age", "scientific revolution", "enlightenment", "19th century", "modern era"],
-    "subtopics": ["Ancient World", "Medieval and Islamic Golden Age", "Scientific Revolution", "Enlightenment", "19th Century", "Modern Era"]
+    "subtopics": ["Ancient World", "Medieval and Islamic Golden Age", "Scientific Revolution", "Enlightenment", "19th Century", "Modern Era", "Astronomy", "Physics", "Chemistry", "Medicine", "Evolution", "Genetics", "Earth Sciences", "Scientific Institutions", "Biology", "Mathematics", "Optics"]
   },
   {
     "id": "trivium",
@@ -183,6 +183,6 @@
     "icon": "Lightbulb",
     "color": "#ca8a04",
     "tags": ["history and society", "natural world", "earth and space", "numbers and logic", "culture and arts", "human mind"],
-    "subtopics": ["History and Society", "Natural World", "Earth and Space", "Numbers and Logic", "Culture and Arts", "Human Mind", "Mythology", "Food and Drink", "Art and Architecture", "Language and Etymology", "Literature", "Inventions"]
+    "subtopics": ["History and Society", "Natural World", "Earth and Space", "Numbers and Logic", "Culture and Arts", "Human Mind", "Mythology", "Food and Drink", "Art and Architecture", "Language and Etymology", "Literature", "Inventions", "Film and Television", "Sport", "Transport", "Fashion and Textiles", "Measurement and Timekeeping", "Customs and Celebrations"]
   }
 ]

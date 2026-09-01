@@ -2,7 +2,7 @@
 
 **Colloquiz — https://colloquiz.app**
 
-Version 1.0 · Last updated 2026-08-29
+Version 1.0 · Last updated 2026-09-01
 
 > **Source of truth.** This file is the canonical text. `app/(legal)/privacy/page.tsx`
 > renders it; edit here first. Placeholders in `[BRACKETS]` must be filled before
@@ -49,7 +49,7 @@ that produces legal or similarly significant effects.
 | Display name / full name | Optional, Settings › Account | Shown to you; your public name appears on leaderboards and to members of groups you join |
 | City | Optional, Settings › Account | Shown on your own profile only |
 | Profile picture | Optional, Settings › Account | Shown to you and to members of groups you join |
-| Your age confirmation | Sign-up | We only offer the Service to people aged 16 and over |
+| Your age confirmation | Sign-up | We only offer the Service to people aged 13 and over |
 | Feedback and question reports | When you submit them | To fix problems and moderate the question bank |
 
 ### 3.2 Data created as you use the Service
@@ -215,9 +215,11 @@ required.
 
 ## 11. Children
 
-The Service is for people aged **16 and over**. You must confirm your age when you sign
-up. We do not knowingly collect data from anyone under 16. If you believe a child has
-created an account, email privacy@colloquiz.app and we will delete it.
+The Service is for people aged **13 and over**. You must confirm your age when you sign
+up. We do not knowingly collect data from anyone under 13. If you believe a child under 13
+has created an account, email privacy@colloquiz.app and we will delete it.
+
+If you are under 18, a parent or guardian should be aware of your use of the Service.
 
 ## 12. Automated content generation
 

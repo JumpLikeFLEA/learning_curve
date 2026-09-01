@@ -1,33 +1,33 @@
 {
-  "generated_at": "2026-08-29T14:11:20.450Z",
+  "generated_at": "2026-08-29T21:56:56.604Z",
   "target_per_difficulty": 30,
   "quiz_size": 10,
   "basis": "questions with status='approved' and visibility='shared' (get_subject_stats)",
   "totals": {
     "subjects_in_taxonomy": 20,
     "subjects_with_questions": 16,
-    "questions_live": 2879,
-    "deficit_total": 261,
-    "deficit_hard": 140,
-    "subjects_broken": 2
+    "questions_live": 3140,
+    "deficit_total": 0,
+    "deficit_hard": 0,
+    "subjects_broken": 0
   },
   "subjects": [
     {
       "id": "mathematics",
       "name": "Mathematics",
       "counts": {
-        "easy": 24,
+        "easy": 30,
         "medium": 38,
-        "hard": 20
+        "hard": 30
       },
-      "total": 82,
+      "total": 98,
       "deficit": {
-        "easy": 6,
+        "easy": 0,
         "medium": 0,
-        "hard": 10
+        "hard": 0
       },
-      "deficitTotal": 16,
-      "priority": "thin",
+      "deficitTotal": 0,
+      "priority": "ok",
       "brokenAt": [],
       "subtopics": [
         "Algebra",
@@ -46,25 +46,33 @@
         "Chain Rule",
         "Applications of Derivatives",
         "Integrals",
-        "Fundamental Theorem of Calculus"
+        "Fundamental Theorem of Calculus",
+        "Arithmetic",
+        "Set Theory",
+        "Analysis",
+        "Abstract Algebra",
+        "Probability",
+        "Mathematical Logic",
+        "Topology",
+        "Complex Analysis"
       ]
     },
     {
       "id": "physics",
       "name": "Physics",
       "counts": {
-        "easy": 24,
-        "medium": 24,
-        "hard": 16
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
       },
-      "total": 64,
+      "total": 90,
       "deficit": {
-        "easy": 6,
-        "medium": 6,
-        "hard": 14
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
       },
-      "deficitTotal": 26,
-      "priority": "thin",
+      "deficitTotal": 0,
+      "priority": "ok",
       "brokenAt": [],
       "subtopics": [
         "Mechanics",
@@ -74,25 +82,27 @@
         "Quantum Physics",
         "Relativity",
         "Nuclear Physics",
-        "Waves"
+        "Waves",
+        "Fluid Mechanics",
+        "Quantum Mechanics"
       ]
     },
     {
       "id": "chemistry",
       "name": "Chemistry",
       "counts": {
-        "easy": 28,
-        "medium": 28,
-        "hard": 14
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
       },
-      "total": 70,
+      "total": 90,
       "deficit": {
-        "easy": 2,
-        "medium": 2,
-        "hard": 16
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
       },
-      "deficitTotal": 20,
-      "priority": "thin",
+      "deficitTotal": 0,
+      "priority": "ok",
       "brokenAt": [],
       "subtopics": [
         "Organic Chemistry",
@@ -101,7 +111,21 @@
         "Biochemistry",
         "Electrochemistry",
         "Thermochemistry",
-        "Analytical Chemistry"
+        "Analytical Chemistry",
+        "Periodic Table",
+        "Acids and Bases",
+        "Stoichiometry",
+        "Organic Reaction Mechanisms",
+        "Aromaticity",
+        "Chemical Equilibrium",
+        "Thermodynamics",
+        "Solubility",
+        "Molecular Structure",
+        "Coordination Chemistry",
+        "Stereochemistry",
+        "Solutions",
+        "Redox Chemistry",
+        "Chemical Kinetics"
       ]
     },
     {
@@ -197,16 +221,16 @@
       "counts": {
         "easy": 32,
         "medium": 32,
-        "hard": 16
+        "hard": 30
       },
-      "total": 80,
+      "total": 94,
       "deficit": {
         "easy": 0,
         "medium": 0,
-        "hard": 14
+        "hard": 0
       },
-      "deficitTotal": 14,
-      "priority": "thin",
+      "deficitTotal": 0,
+      "priority": "ok",
       "brokenAt": [],
       "subtopics": [
         "Poetry",
@@ -216,7 +240,15 @@
         "World Literature",
         "Literary Theory",
         "American Literature",
-        "British Literature"
+        "British Literature",
+        "Poetic Form",
+        "Narrative Technique",
+        "Literary Criticism",
+        "Modernism",
+        "Classical Literature",
+        "Genre",
+        "Romanticism",
+        "Medieval Literature"
       ]
     },
     {
@@ -225,16 +257,16 @@
       "counts": {
         "easy": 89,
         "medium": 80,
-        "hard": 28
+        "hard": 30
       },
-      "total": 197,
+      "total": 199,
       "deficit": {
         "easy": 0,
         "medium": 0,
-        "hard": 2
+        "hard": 0
       },
-      "deficitTotal": 2,
-      "priority": "thin",
+      "deficitTotal": 0,
+      "priority": "ok",
       "brokenAt": [],
       "subtopics": [
         "Algorithms",
@@ -248,7 +280,8 @@
         "Software Engineering",
         "Programming Languages",
         "Docker",
-        "PyTorch"
+        "PyTorch",
+        "Theory of Computation"
       ]
     },
     {
@@ -333,18 +366,18 @@
       "id": "music",
       "name": "Music",
       "counts": {
-        "easy": 24,
-        "medium": 24,
-        "hard": 12
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
       },
-      "total": 60,
+      "total": 90,
       "deficit": {
-        "easy": 6,
-        "medium": 6,
-        "hard": 18
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
       },
-      "deficitTotal": 30,
-      "priority": "thin",
+      "deficitTotal": 0,
+      "priority": "ok",
       "brokenAt": [],
       "subtopics": [
         "Music Theory",
@@ -352,7 +385,17 @@
         "Harmony",
         "Rhythm",
         "Composition",
-        "World Music"
+        "World Music",
+        "Notation",
+        "Performance Practice",
+        "Instruments",
+        "Rhythm and Meter",
+        "Jazz",
+        "Modes",
+        "Musical Form",
+        "Counterpoint",
+        "Tuning and Acoustics",
+        "Twentieth Century Music"
       ]
     },
     {
@@ -498,21 +541,19 @@
       "id": "esports_history",
       "name": "Esports History",
       "counts": {
-        "easy": 24,
-        "medium": 14,
-        "hard": 3
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
       },
-      "total": 41,
+      "total": 90,
       "deficit": {
-        "easy": 6,
-        "medium": 16,
-        "hard": 27
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
       },
-      "deficitTotal": 49,
-      "priority": "broken",
-      "brokenAt": [
-        "hard"
-      ],
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
       "subtopics": [
         "Counter Strike",
         "Dota 2",
@@ -524,18 +565,18 @@
       "id": "science_history",
       "name": "Science History",
       "counts": {
-        "easy": 15,
-        "medium": 15,
-        "hard": 15
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
       },
-      "total": 45,
+      "total": 90,
       "deficit": {
-        "easy": 15,
-        "medium": 15,
-        "hard": 15
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
       },
-      "deficitTotal": 45,
-      "priority": "thin",
+      "deficitTotal": 0,
+      "priority": "ok",
       "brokenAt": [],
       "subtopics": [
         "Ancient World",
@@ -543,29 +584,37 @@
         "Scientific Revolution",
         "Enlightenment",
         "19th Century",
-        "Modern Era"
+        "Modern Era",
+        "Astronomy",
+        "Physics",
+        "Chemistry",
+        "Medicine",
+        "Evolution",
+        "Genetics",
+        "Earth Sciences",
+        "Scientific Institutions",
+        "Biology",
+        "Mathematics",
+        "Optics"
       ]
     },
     {
       "id": "trivium",
       "name": "Trivium",
       "counts": {
-        "easy": 9,
-        "medium": 16,
-        "hard": 6
+        "easy": 30,
+        "medium": 30,
+        "hard": 30
       },
-      "total": 31,
+      "total": 90,
       "deficit": {
-        "easy": 21,
-        "medium": 14,
-        "hard": 24
+        "easy": 0,
+        "medium": 0,
+        "hard": 0
       },
-      "deficitTotal": 59,
-      "priority": "broken",
-      "brokenAt": [
-        "easy",
-        "hard"
-      ],
+      "deficitTotal": 0,
+      "priority": "ok",
+      "brokenAt": [],
       "subtopics": [
         "History and Society",
         "Natural World",
@@ -578,7 +627,13 @@
         "Art and Architecture",
         "Language and Etymology",
         "Literature",
-        "Inventions"
+        "Inventions",
+        "Film and Television",
+        "Sport",
+        "Transport",
+        "Fashion and Textiles",
+        "Measurement and Timekeeping",
+        "Customs and Celebrations"
       ]
     }
   ]

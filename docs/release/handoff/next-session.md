@@ -51,11 +51,12 @@ Sentry sends nothing until a DSN is set; create the project in the **EU region**
 The code path is done. What remains is **content** and **release verification** — the user
 authors content themselves; your role in F..N is running the import + regeneration loop.
 
-1. **Content (§C)** — deficit at last measure **346 (176 hard)**; three subjects unplayable
-   (`data_analysis`, `esports_history`, `trivium`). Regenerate the live state with
-   `npx tsx --env-file=.env.local scripts/build-content-prompts.ts`, import batches with the
-   `import-question-batch` skill, re-run the regen after each import. `esports_history` is
-   blocked on more subtopics in `data/subjects.json` (only "Counter Strike" exists).
+1. **Content (§C) — DONE.** Deficit is now **0** (`content-gap.json` 2026-08-29 21:56:
+   `deficit_total: 0`, `deficit_hard: 0`, `subjects_broken: 0`); all 16 content subjects
+   pass 30/30/30, including the three that were unplayable (`data_analysis`,
+   `esports_history`, `trivium`). Regenerate the live state any time with
+   `npx tsx --env-file=.env.local scripts/build-content-prompts.ts`; import further batches
+   with the `import-question-batch` skill and re-run the regen after each import.
 2. **Release verification (§F / Session Z)** — `npm run check` · `npm test` · `next build`
    clean; the full manual pass on a throwaway account (`verify` skill); `curl -I .../terms`
    → 200 signed in and out; `npm run bench -- --target=prod` as the 1.0 baseline; tag
@@ -69,7 +70,8 @@ authors content themselves; your role in F..N is running the import + regenerati
 
 ## Decisions locked — do not reopen
 
-Public but unlisted (`noindex`) · GDPR/UK-GDPR + Serbian law · 16+ · free · erasure by
+Public but unlisted (`noindex`) · GDPR/UK-GDPR + Serbian law · 13+ (self-serve; under-13
+deferred to 1.1) · free · erasure by
 anonymise/block · Courses off · author nav hidden · legal pages public · rate limiting on
 signup + export only · **no cookie banner** (Sentry EU + cookieless analytics keep this true).
 

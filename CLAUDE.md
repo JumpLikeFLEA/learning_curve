@@ -342,12 +342,24 @@
 - AuthScreen (app/(auth)/AuthScreen.tsx): sign-up clickwrap RESTORED
   (2026-08-29), deliberately REVERSING the 2026-07-06 entry that removed the
   Terms/Privacy line. Register mode now shows a required consent checkbox ("I am
-  16 or over and agree to the Terms of Service and Privacy Policy", links to
+  13 or over and agree to the Terms of Service and Privacy Policy", links to
   /terms + /privacy) gated in handleSubmit, plus a short consent-by-action note
   under the Google/Discord buttons for the OAuth path (which bypasses the form).
   Consent is RECORDED server-side by migration 036: handle_new_user() stamps
   profiles.terms_accepted_at + terms_version on every new profile. Composed from
   classes already in AuthScreen; the checkbox uses accent-brand. Do not remove
+- Age floor lowered 16 → 13 (2026-09-01), deliberately REVERSING the DoR's locked
+  "16+ only" decision. The 16+ bar mirrored GDPR Art. 8's DEFAULT digital-consent
+  age, but Art. 8 only bites when the legal basis is CONSENT — Colloquiz's basis is
+  contract (Art. 6(1)(b)) + legitimate interests, so nothing forces 16, and 16+
+  needlessly excluded the secondary-school audience an educational quiz app exists
+  for. 13 is the global baseline (US COPPA, lowest GDPR member-state age, UK DPA
+  2018). Copy/clause change only — no DOB is collected and there is no server-side
+  age logic, just the boolean clickwrap; no migration, terms_version stays '1.0'.
+  Touched: legal/terms-of-service.md §2 (+ an under-18 parental-permission clause),
+  legal/privacy-policy.md §3.1 + §11, AuthScreen.tsx (4 strings), and the DoR /
+  next-session decision records. Under-13 restricted "Child Accounts" (verifiable
+  parental consent) are DEFERRED to 1.1 and must NOT be promised in the public docs
 - Settings > Data and privacy — DELETE half added (2026-08-29, migration 037 +
   lib/accountDelete.ts + lib/supabase/admin.ts + app/api/account/delete/route.ts +
   settings/DataPrivacySection.tsx). Right to erasure by ANONYMISATION, not row

@@ -193,7 +193,7 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState<OAuthProvider | null>(null);
-  // Clickwrap consent for the email/password sign-up path (16+ + Terms/Privacy).
+  // Clickwrap consent for the email/password sign-up path (13+ + Terms/Privacy).
   const [agreed, setAgreed] = useState(false);
 
   const handleToggle = () => {
@@ -215,7 +215,7 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
     }
 
     if (mode === "register" && !agreed) {
-      setError("Please confirm you are 16 or over and accept the Terms and Privacy Policy.");
+      setError("Please confirm you are 13 or over and accept the Terms and Privacy Policy.");
       return;
     }
 
@@ -408,7 +408,7 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
 
               {mode === "register" && (
                 <p className="text-xs text-muted-foreground text-center">
-                  Signing up with Google or Discord also confirms you are 16 or over and accept our{" "}
+                  Signing up with Google or Discord also confirms you are 13 or over and accept our{" "}
                   <Link href="/terms" target="_blank" rel="noreferrer" className="text-brand-text hover:underline">Terms</Link>{" "}
                   and{" "}
                   <Link href="/privacy" target="_blank" rel="noreferrer" className="text-brand-text hover:underline">Privacy Policy</Link>.
@@ -509,7 +509,7 @@ export function AuthScreen({ initialMode, initialError, initialNotice, redirectT
                   className="mt-0.5 h-4 w-4 shrink-0 accent-brand cursor-pointer"
                 />
                 <span>
-                  I am 16 or over and agree to the{" "}
+                  I am 13 or over and agree to the{" "}
                   <Link href="/terms" target="_blank" rel="noreferrer" className="text-brand-text font-medium hover:underline">Terms of Service</Link>{" "}
                   and{" "}
                   <Link href="/privacy" target="_blank" rel="noreferrer" className="text-brand-text font-medium hover:underline">Privacy Policy</Link>.

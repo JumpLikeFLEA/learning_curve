@@ -15,7 +15,7 @@
 | --- | --- |
 | Launch type | Public but unlisted, `noindex` |
 | Legal regime | EU/EEA + UK, GDPR / UK-GDPR baseline |
-| Minors | 16+ only — ToS clause + signup age declaration |
+| Minors | 13+ (self-serve) — ToS clause + signup age declaration; under-13 restricted accounts deferred to 1.1 |
 | Money | Free at 1.0, no payment terms |
 | Content bar | ≥30 approved+shared per difficulty, for the 16 subjects that have content |
 | Empty subjects | `economics`, `art`, `languages`, `motion_design_and_video` left unfilled — already invisible in the grid |
@@ -68,9 +68,10 @@
 - [x] `proxy.ts` — new `publicRoutes` list (`/terms`, `/privacy`, `/subprocessors`),
       returns early after the session refresh; kept **separate** from `authRoutes`.
       Verified locally: all three return **200 signed out**, not a 307 to `/login`
-- [x] Signup clickwrap in `app/(auth)/AuthScreen.tsx` — required 16+/Terms consent
+- [x] Signup clickwrap in `app/(auth)/AuthScreen.tsx` — required 13+/Terms consent
       checkbox in register mode (gated in `handleSubmit`) + an OAuth consent-by-action
-      note under the Google/Discord buttons
+      note under the Google/Discord buttons. **Age floor lowered 16 → 13 on 2026-09-01**
+      (see the *Minors* decision row)
 - [x] Migration `036_terms_acceptance.sql`: `profiles.terms_accepted_at` + `terms_version`,
       stamped by `handle_new_user()` on every new profile. **NO column GRANT was added**
       (a reasoned deviation from this line's original wording): the trigger is
@@ -107,26 +108,27 @@
       group deleted, other member's group survives, and sign-in rejected after ban
       ("User is banned"). `lib/supabase/admin.ts` is the first service-role client (server-only)
 
-## C · Content — 30 per difficulty
+## C · Content — 30 per difficulty — DONE (2026-08-29)
 
-Deficit at session A: **346 questions, 176 of them `hard`**. Regenerate with
-`npx tsx --env-file=.env.local scripts/build-content-prompts.ts`; live state lives in
+Deficit at session A was **346 questions, 176 of them `hard`**; it is now **0**. Regenerate
+with `npx tsx --env-file=.env.local scripts/build-content-prompts.ts`; live state lives in
 [`content-gap.json`](./content-gap.json), prompts in [`prompts/`](./prompts/README.md).
 
-**Unplayable today — fix first (~32 questions clears all three):**
+Per the regenerated [`content-gap.json`](./content-gap.json) (2026-08-29 21:56):
+`deficit_total: 0`, `deficit_hard: 0`, `subjects_broken: 0`.
 
-- [ ] `data_analysis` — 27 / 0 / 0 · no medium, no hard
-- [ ] `esports_history` — 20 / 10 / 0 · no hard · **blocked: only one subtopic
-      ("Counter Strike") exists; 60 more questions needs more subtopics in
-      `data/subjects.json`**
-- [ ] `trivium` — 5 / 12 / 3 · below the 10-question floor at easy *and* hard
+**Formerly unplayable — now cleared:**
 
-**Thin — bring to 30/30/30:**
+- [x] `data_analysis` — 34 / 34 / 33
+- [x] `esports_history` — 30 / 30 / 30 (subtopics expanded in `data/subjects.json`:
+      Counter Strike, Dota 2, StarCraft, League of Legends)
+- [x] `trivium` — 30 / 30 / 30
 
-- [ ] `science_history` (45) · [ ] `music` (30) · [ ] `physics` (26) ·
-      [ ] `chemistry` (20) · [ ] `mathematics` (16) · [ ] `literature` (14) ·
-      [ ] `computer_science` (2)
-- [ ] Final check: no subject under 30 at any difficulty
+**Formerly thin — now at ≥30/30/30:**
+
+- [x] `science_history` · [x] `music` · [x] `physics` · [x] `chemistry` ·
+      [x] `mathematics` · [x] `literature` · [x] `computer_science`
+- [x] Final check: no subject under 30 at any difficulty (all 16 content subjects pass)
 
 ## D · Ops and resilience — DONE (Session E, 2026-08-29)
 
@@ -212,3 +214,10 @@ Courses (built, dark) · author/tutor nav (built, dark) · marketing/landing pag
 indexing · account **hard** delete · transactional email beyond Supabase Auth · payments ·
 E2E and component tests · rate limiting beyond signup and export · cookie banner ·
 filling the four empty subjects.
+
+**Under-13 restricted accounts (deferred to 1.1).** 1.0's self-serve floor is 13. A
+Quizlet-style under-13 experience — a restricted "Child Account" gated behind **verifiable
+parental consent** (capture a parent's email, an email consent round-trip, features gated
+off, a parent request channel) — is a feature build, not a doc edit, and pulls **US COPPA**
+into a product currently scoped to EU/UK + Serbian law. Out of scope for 1.0 on purpose;
+do not promise it in the public Terms or Privacy Policy.
