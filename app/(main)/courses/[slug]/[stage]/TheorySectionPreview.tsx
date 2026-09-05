@@ -34,10 +34,22 @@ export function TheorySectionPreview({ blocks }: { blocks: TheoryBlock[] }) {
 function Block({ block }: { block: TheoryBlock }) {
   switch (block.type) {
     case "prose":
+      // space-y-3: multi-paragraph bodies rely on this wrapper for
+      // inter-paragraph spacing (Preflight zeroes <p> margins). Replicate on
+      // the callout/example wrappers when those get distinct visual treatment
+      // — their bodies can also be multi-paragraph.
       return (
-        <div className="text-foreground leading-relaxed">
+        <div className="text-foreground leading-relaxed space-y-3">
           <ClientMath text={block.body} />
         </div>
+      );
+
+    case "heading":
+      // Mirror of TheorySection.tsx's heading case (keep in sync by hand).
+      return (
+        <h2 className="text-lg font-semibold text-foreground mt-2 first:mt-0">
+          <ClientMath text={block.text} />
+        </h2>
       );
 
     case "formula":

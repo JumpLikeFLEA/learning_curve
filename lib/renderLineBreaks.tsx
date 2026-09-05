@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from "react";
+import { parseInlineMarkup } from "./inlineMarkup";
 
 /**
  * Shared line-break / paragraph primitives for the math-aware text pipeline.
@@ -26,6 +27,8 @@ import { Fragment, type ReactNode } from "react";
  *
  * This module knows nothing about segmentation or KaTeX — it only handles the
  * paragraph split and the single-\n → <br> transform within one text segment.
+ * Inline markup (**bold**) is delegated to lib/inlineMarkup per line, after the
+ * \n split, so a marker only ever sees one math-free, break-free line.
  * Kept dep-free (react only) so both server and client bundles can share it.
  */
 
@@ -75,7 +78,7 @@ export function renderLinesToNodes(
   return lines.map((line, li) => (
     <Fragment key={`${keyPrefix}-l${li}`}>
       {li > 0 && <br />}
-      {line}
+      {parseInlineMarkup(line, `${keyPrefix}-l${li}`)}
     </Fragment>
   ));
 }

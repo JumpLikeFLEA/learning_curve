@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  Bold,
   BookOpen,
   BookMarked,
   ChevronDown,
@@ -13,6 +14,7 @@ import {
   ClipboardCheck,
   Eye,
   GripVertical,
+  Heading,
   History,
   Info,
   Lightbulb,
@@ -62,6 +64,7 @@ import { cn } from "@/lib/utils";
 import { CALLOUT_TONE } from "@/lib/calloutTone";
 import type { TheoryBlock } from "@/lib/courseContent";
 import { THEORY_BLOCK_TYPES } from "@/lib/courseContent";
+import { toggleWrap } from "@/lib/textareaMarkup";
 import type { AuthoringGroup } from "@/lib/courses";
 import { loadKatex, renderRichTextNodes } from "@/app/components/clientMath";
 
@@ -79,6 +82,8 @@ type LoadedKatex = Awaited<ReturnType<typeof loadKatex>>;
  */
 function blockAuthoredFields(block: EditableBlock): { field: string; value: string }[] {
   switch (block.type) {
+    case "heading":
+      return [{ field: "text", value: block.text }];
     case "prose":
     case "formula":
     case "callout":
@@ -127,6 +132,7 @@ const getSnapshotFalse = () => false;
 type ItemWithId = { _id: string; value: string };
 type EditableBlock =
   | ({ _id: string } & Extract<TheoryBlock, { type: "prose" }>)
+  | ({ _id: string } & Extract<TheoryBlock, { type: "heading" }>)
   | ({ _id: string } & Extract<TheoryBlock, { type: "formula" }>)
   | ({ _id: string } & Extract<TheoryBlock, { type: "callout" }>)
   | ({ _id: string } & Extract<TheoryBlock, { type: "definition" }>)
@@ -166,6 +172,7 @@ const withId = (b: TheoryBlock): EditableBlock => {
       return { _id, type: "example", statement: b.statement, steps: b.steps.map(mintItem) };
     case "list":
       return { _id, type: "list", ordered: b.ordered, items: b.items.map(mintItem) };
+    case "heading":
     case "prose":
     case "formula":
     case "callout":
@@ -186,6 +193,8 @@ const toWire = (bs: EditableBlock[]): TheoryBlock[] =>
         return { type: "example", statement: b.statement, steps: b.steps.map((it) => it.value) };
       case "list":
         return { type: "list", ordered: b.ordered, items: b.items.map((it) => it.value) };
+      case "heading":
+        return { type: "heading", text: b.text };
       case "prose":
         return { type: "prose", body: b.body };
       case "formula":
@@ -204,6 +213,8 @@ function emptyBlock(type: TheoryBlock["type"]): TheoryBlock {
   switch (type) {
     case "prose":
       return { type: "prose", body: "New paragraph." };
+    case "heading":
+      return { type: "heading", text: "Section heading" };
     case "formula":
       return { type: "formula", body: "\\[ a^2 + b^2 = c^2 \\]" };
     case "callout":
@@ -225,6 +236,7 @@ type AccentKey = "brand" | "success" | "neutral";
 
 const BLOCK_META: Record<TheoryBlock["type"], { label: string; Icon: LucideIcon; accent: AccentKey }> = {
   prose:      { label: "Prose",      Icon: Text,       accent: "brand"   },
+  heading:    { label: "Heading",    Icon: Heading,    accent: "neutral" },
   definition: { label: "Definition", Icon: BookMarked, accent: "brand"   },
   formula:    { label: "Formula",    Icon: Sigma,      accent: "success" },
   example:    { label: "Example",    Icon: Lightbulb,  accent: "success" },
@@ -605,6 +617,14 @@ export function StageEditor({
             );
           })()}
 
+          {blocks.length > 0 && (
+            // Always-visible end-of-list insert — guarantees discoverability
+            // independent of the inline "+" gap zones. Inserts at index N.
+            <div className="flex justify-center">
+              <InsertZoneMenu index={blocks.length} onInsert={addBlockAt} alwaysVisible />
+            </div>
+          )}
+
           <div className="sticky bottom-4 z-10">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
               <div className="text-sm text-muted-foreground">
@@ -851,7 +871,7 @@ function InsertZone({
       {/* Resting: a very faint line, revealed a bit on hover of the zone */}
       <span
         aria-hidden
-        className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-border opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
+        className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-border opacity-30 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity"
       />
       <button
         type="button"
@@ -861,7 +881,7 @@ function InsertZone({
         aria-expanded={open}
         className={cn(
           "relative z-10 cursor-pointer inline-flex items-center justify-center w-5 h-5 rounded-full border border-border bg-card text-muted-foreground transition-opacity",
-          "opacity-35 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100",
+          "opacity-70 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100",
           "hover:text-brand hover:border-brand",
           open && "opacity-100 text-brand border-brand",
         )}
@@ -1176,6 +1196,18 @@ function BlockFields({
         />
       );
 
+    case "heading":
+      // Single-line section divider — no `multiline` (schema forbids \n).
+      return (
+        <AuthoredField
+          label="Text"
+          field="text"
+          value={block.text}
+          rendered={rendered}
+          onChange={(v) => onChange({ ...block, text: v })}
+        />
+      );
+
     case "formula":
       // Formula opts out of swap-to-edit: raw LaTeX source and rendered math
       // look nothing alike, and authors iterate on the source, so keep both
@@ -1361,6 +1393,39 @@ function AuthoredField({
   useAutosizeTextarea(taRef, value, editing && multiline);
   useAutosizeTextarea(formulaRef, value, !swapMode);
 
+  // Inline-markup toolbar (Bold, for now). Scoped entirely to this editing
+  // field: the selection is read straight off taRef, the toggle is a pure
+  // string op (lib/textareaMarkup), and the result flows back through the
+  // existing `onChange` — no lifted ref, no editor-level state.
+  //
+  // `value` is controlled, so the textarea only shows the new string after the
+  // re-render onChange triggers; `pendingSelection` carries the offsets across
+  // that render and an effect keyed on `value` re-applies them (+ refocus) so
+  // the author keeps typing where the toggle left the caret.
+  const pendingSelection = useRef<{ start: number; end: number } | null>(null);
+
+  useEffect(() => {
+    const pending = pendingSelection.current;
+    if (!pending) return;
+    pendingSelection.current = null;
+    const el = taRef.current;
+    if (!el) return;
+    const raf = requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(pending.start, pending.end);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+
+  const applyBold = useCallback(() => {
+    const el = taRef.current;
+    if (!el) return;
+    const next = toggleWrap(value, el.selectionStart, el.selectionEnd, "**");
+    if (next.value === value) return;
+    pendingSelection.current = { start: next.selStart, end: next.selEnd };
+    onChange(next.value);
+  }, [value, onChange]);
+
   // Formula: unchanged legacy layout — textarea above, preview strip below.
   if (!swapMode) {
     return (
@@ -1395,6 +1460,24 @@ function AuthoredField({
     <div className="space-y-1.5">
       <label className="block text-xs font-medium text-muted-foreground">{label}</label>
       {editing ? (
+        <>
+        {multiline ? (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              // preventDefault on mousedown keeps focus in the textarea — a
+              // blur here would fire onBlur → setEditing(false) and unmount the
+              // textarea before onClick runs.
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={applyBold}
+              aria-label="Bold"
+              title="Bold (Ctrl/Cmd+B)"
+              className="cursor-pointer inline-flex items-center justify-center w-7 h-7 rounded-md border border-border bg-background text-muted-foreground hover:text-brand hover:border-brand focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+            >
+              <Bold size={13} />
+            </button>
+          </div>
+        ) : null}
         <textarea
           ref={taRef}
           value={value}
@@ -1410,6 +1493,13 @@ function AuthoredField({
             } else if (!multiline && e.key === "Enter") {
               e.preventDefault();
               taRef.current?.blur();
+            } else if (multiline && (e.ctrlKey || e.metaKey) && (e.key === "b" || e.key === "B")) {
+              // Ctrl/Cmd-B → same toggle as the toolbar button. stopPropagation
+              // keeps the event from reaching the sidebar's window-level
+              // keydown listener (ui/sidebar.tsx), which also binds Cmd/Ctrl-B.
+              e.preventDefault();
+              e.stopPropagation();
+              applyBold();
             }
           }}
           // Single-line: rows={1} so the textarea's intrinsic height isn't
@@ -1423,6 +1513,7 @@ function AuthoredField({
           className={`${boxShape} block ${multiline ? "" : "resize-none"} bg-background border-border font-mono focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring`}
           spellCheck={false}
         />
+        </>
       ) : (
         <div
           role="button"

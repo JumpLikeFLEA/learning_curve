@@ -35,11 +35,27 @@ function Block({ block }: { block: TheoryBlock }) {
   switch (block.type) {
     case "prose":
       // <div>, not <p>: RichText now emits one <p> per paragraph, and <p>
-      // cannot nest <p>. Classes unchanged.
+      // cannot nest <p>.
+      // space-y-3: multi-paragraph bodies rely on this wrapper for
+      // inter-paragraph spacing (Preflight zeroes <p> margins). Replicate on
+      // the callout/example wrappers when those get distinct visual treatment
+      // — their bodies can also be multi-paragraph.
       return (
-        <div className="text-foreground leading-relaxed">
+        <div className="text-foreground leading-relaxed space-y-3">
           <RichText text={block.body} />
         </div>
+      );
+
+    case "heading":
+      // One heading level only — a section divider within the stage, not a
+      // document outline. mt-2 buys extra space above (on top of the gap-5
+      // block flow) so it reads as "new section"; first:mt-0 keeps a
+      // leading heading flush. Size/weight sit above prose, below the
+      // stage title (text-2xl font-bold).
+      return (
+        <h2 className="text-lg font-semibold text-foreground mt-2 first:mt-0">
+          <RichText text={block.text} />
+        </h2>
       );
 
     case "formula":

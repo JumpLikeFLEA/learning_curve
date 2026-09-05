@@ -43,6 +43,8 @@ export type TheoryValidateResult =
  */
 export function theoryBlockFields(block: TheoryBlock): { field: string; value: string }[] {
   switch (block.type) {
+    case "heading":
+      return [{ field: "text", value: block.text }];
     case "prose":
     case "formula":
     case "callout":

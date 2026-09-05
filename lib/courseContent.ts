@@ -76,6 +76,14 @@ const ProseBlock = z.strictObject({
   body: authoredString(1, { allowNewlines: true }),
 });
 
+// A single-level section divider inside a stage — NOT a document outline. There
+// is deliberately no h2/h3/h4: `text` is one line (no `allowNewlines`), and the
+// renderer picks the one heading treatment.
+const HeadingBlock = z.strictObject({
+  type: z.literal("heading"),
+  text: authoredString(),
+});
+
 const FormulaBlock = z.strictObject({
   type: z.literal("formula"),
   body: authoredString(),
@@ -107,6 +115,7 @@ const DefinitionBlock = z.strictObject({
 
 export const TheoryBlockSchema = z.discriminatedUnion("type", [
   ProseBlock,
+  HeadingBlock,
   FormulaBlock,
   ExampleBlock,
   CalloutBlock,
@@ -121,6 +130,7 @@ export type TheoryBlock = z.infer<typeof TheoryBlockSchema>;
 // The discriminator values, for exhaustiveness assertions in the renderer.
 export const THEORY_BLOCK_TYPES = [
   "prose",
+  "heading",
   "formula",
   "example",
   "callout",
